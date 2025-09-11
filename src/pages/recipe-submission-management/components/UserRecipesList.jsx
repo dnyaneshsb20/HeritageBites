@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Button from '../../../components/ui/Button';
 import Image from '../../../components/AppImage';
 import Icon from '../../../components/AppIcon';
-import Footer from '../../dashboard/components/Footer';
 
 const UserRecipesList = ({ onNewRecipe }) => {
   const [activeTab, setActiveTab] = useState('published');
@@ -338,7 +337,6 @@ const UserRecipesList = ({ onNewRecipe }) => {
           )}
         </div>
       </div>
-      <Footer/>
     </div>
   );
 };
