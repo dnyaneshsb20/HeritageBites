@@ -137,6 +137,7 @@ const RecipeSubmissionManagement = () => {
         <main className="container mx-auto px-4 py-8">
           <UserRecipesList onNewRecipe={startNewRecipe} />
         </main>
+        <Footer/>
       </div>
     );
   }
@@ -311,7 +312,7 @@ const RecipeSubmissionManagement = () => {
         isOpen={showGuidelines}
         onClose={() => setShowGuidelines(false)}
       />
-      <Footer/>
+      {/* <Footer/> */}
     </div>
   );
 };
