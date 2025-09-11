@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -235,6 +237,7 @@ const Header = () => {
                         onClick={() => {
                           setIsUserMenuOpen(false);
                           console.log('Logging out...');
+                          navigate("/");
                         }}
                       >
                         <Icon name="LogOut" size={16} />
