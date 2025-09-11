@@ -9,6 +9,7 @@ import ProductCard from './components/ProductCard';
 import FeaturedFarmers from './components/FeaturedFarmers';
 import ProductDetailModal from './components/ProductDetailModal';
 import SearchBar from './components/SearchBar';
+import Footer from '../dashboard/components/Footer';
 
 const IngredientMarketplace = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -507,6 +508,7 @@ const IngredientMarketplace = () => {
           onClose={() => setIsProductModalOpen(false)}
           onAddToCart={handleAddToCart}
         />
+        <Footer/>
       </div>
     </>
   );
