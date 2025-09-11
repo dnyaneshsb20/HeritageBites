@@ -7,6 +7,7 @@ import RegionalMap from './components/RegionalMap';
 import StoryCard from './components/StoryCard';
 import FloatingActionButton from './components/FloatingActionButton';
 import Icon from '../../components/AppIcon';
+import Footer from '../dashboard/components/Footer';
 
 const RecipeDiscoveryDashboard = () => {
   const [activeFilters, setActiveFilters] = useState([]);
@@ -358,6 +359,7 @@ const RecipeDiscoveryDashboard = () => {
       </main>
       {/* Floating Action Button */}
       <FloatingActionButton />
+      <Footer />
     </div>
   );
 };
