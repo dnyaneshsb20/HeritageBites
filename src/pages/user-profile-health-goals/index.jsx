@@ -9,6 +9,7 @@ import RecipeHistorySection from './components/RecipeHistorySection';
 import AchievementBadgesSection from './components/AchievementBadgesSection';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import Footer from '../dashboard/components/Footer';
 
 const UserProfileHealthGoals = () => {
   const [expandedSections, setExpandedSections] = useState({
@@ -259,6 +260,7 @@ const UserProfileHealthGoals = () => {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 };
