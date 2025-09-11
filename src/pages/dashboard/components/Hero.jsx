@@ -44,7 +44,7 @@ const Hero = () => {
               <Button 
                 variant="hero" 
                 size="lg" 
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
+                className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff] absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
               >
                 Search
               </Button>
