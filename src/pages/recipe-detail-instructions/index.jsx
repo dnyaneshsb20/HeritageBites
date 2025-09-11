@@ -9,6 +9,7 @@ import NutritionPanel from './components/NutritionPanel';
 import CulturalStory from './components/CulturalStory';
 import SimilarRecipes from './components/SimilarRecipes';
 import ReviewsSection from './components/ReviewsSection';
+import Footer from 'pages/dashboard/components/Footer';
 
 const RecipeDetailInstructions = () => {
   const [searchParams] = useSearchParams();
@@ -383,6 +384,7 @@ const RecipeDetailInstructions = () => {
           <SimilarRecipes recipes={mockSimilarRecipes} />
         </div>
       </main>
+      <Footer/>
     </div>
   );
 };
