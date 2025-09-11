@@ -312,7 +312,7 @@ const RecipeSubmissionManagement = () => {
         isOpen={showGuidelines}
         onClose={() => setShowGuidelines(false)}
       />
-      {/* <Footer/> */}
+      <Footer/>
     </div>
   );
 };
