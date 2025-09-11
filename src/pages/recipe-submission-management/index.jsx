@@ -11,6 +11,7 @@ import SubmissionGuidelines from './components/SubmissionGuidelines';
 import UserRecipesList from './components/UserRecipesList';
 import Button from '../../components/ui/Button';
 import Icon from '../../components/AppIcon';
+import Footer from '../dashboard/components/Footer';
 
 const RecipeSubmissionManagement = () => {
   const [currentView, setCurrentView] = useState('list'); // 'list' or 'form'
@@ -310,6 +311,7 @@ const RecipeSubmissionManagement = () => {
         isOpen={showGuidelines}
         onClose={() => setShowGuidelines(false)}
       />
+      <Footer/>
     </div>
   );
 };
