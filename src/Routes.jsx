@@ -10,6 +10,7 @@ import AdminRecipeManagement from './pages/admin-recipe-management';
 import RecipeDetailInstructions from './pages/recipe-detail-instructions';
 import RecipeDiscoveryDashboard from './pages/recipe-discovery-dashboard';
 import Dashboard from './pages/dashboard';
+import SignIn from "./pages/sign-in";
 
 
 const Routes = () => {
@@ -27,6 +28,7 @@ const Routes = () => {
         <Route path="/recipe-detail-instructions" element={<RecipeDetailInstructions />} />
         <Route path="/recipe-discovery-dashboard" element={<RecipeDiscoveryDashboard />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
       </ErrorBoundary>
