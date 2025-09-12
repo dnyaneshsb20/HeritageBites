@@ -4,14 +4,16 @@ import Icon from '../AppIcon';
 import Button from './Button';
 import Input from './Input';
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 const Header = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const isAuthenticated = !!user;
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [cartItemCount] = useState(3);
-  const [isAuthenticated] = useState(true);
   const location = useLocation();
   const searchRef = useRef(null);
   const userMenuRef = useRef(null);
@@ -176,9 +178,11 @@ const Header = () => {
           </Link>
 
           {/* User Menu */}
-          {/* <div className="relative" ref={userMenuRef}>
+          {/* User Menu */}
+          <div className="relative" ref={userMenuRef}>
             {isAuthenticated ? (
               <>
+                {/* Profile Button */}
                 <Button
                   variant="ghost"
                   size="icon"
@@ -189,13 +193,18 @@ const Header = () => {
                     <Icon name="User" size={16} color="white" />
                   </div>
                 </Button>
-                
+
                 {isUserMenuOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-warm-lg z-50">
                     <div className="p-3 border-b border-border">
-                      <p className="font-body font-medium text-foreground">John Doe</p>
-                      <p className="text-sm text-muted-foreground">john@example.com</p>
+                      <p className="font-body font-medium text-foreground">
+                        {user?.name || "Guest User"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {user?.email || "guest@example.com"}
+                      </p>
                     </div>
+
                     <div className="py-2">
                       <Link
                         to="/user-profile-health-goals"
@@ -230,13 +239,14 @@ const Header = () => {
                         <span>Admin Panel</span>
                       </Link>
                     </div>
+
                     <div className="border-t border-border py-2">
                       <button
                         className="flex items-center space-x-3 px-3 py-2 text-sm font-body text-destructive hover:bg-muted transition-colors w-full text-left"
                         onClick={() => {
                           setIsUserMenuOpen(false);
-                          console.log('Logging out...');
-                          navigate("/");
+                          logout(); // ✅ call from AuthContext
+                          navigate("/"); // go back to sign in
                         }}
                       >
                         <Icon name="LogOut" size={16} />
@@ -248,21 +258,13 @@ const Header = () => {
               </>
             ) : (
               <div className="flex items-center space-x-2">
-                <Button variant="ghost" size="sm">
-                  Sign In
-                </Button>
-                <Button variant="default" size="sm">
-                  Sign Up
-                </Button>
+                <Link to="/signin">
+                  <Button variant="default" size="sm">
+                    Sign In
+                  </Button>
+                </Link>
               </div>
             )}
-          </div> */}
-          <div>
-            <Link to="/signin">
-              <Button variant="default" size="sm">
-                Sign In
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
