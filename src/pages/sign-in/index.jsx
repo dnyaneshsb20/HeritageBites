@@ -11,49 +11,65 @@ const SignIn = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false); // toggle state
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState(""); // only for Sign Up
+
+  // form states
+  const [fullName, setFullName] = useState(""); 
+  const [username, setUsername] = useState(""); 
+  const [email, setEmail] = useState(""); 
+  const [password, setPassword] = useState(""); 
+  const [confirmPassword, setConfirmPassword] = useState(""); 
+
   const [error, setError] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
 
-    // Hardcoded credentials
-    const hardcodedUsername = "dsb";
-    const hardcodedPassword = "1234";
-
-    if (!email.trim() || !password.trim()) {
-      setError("Please enter both email and password.");
+    if (isSignUp) {
+      // simple validation for signup
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
+      console.log("Sign Up Data:", { fullName, username, email, password });
+      // TODO: send signup data to backend / supabase
+      alert("Account created! Now you can log in.");
+      setIsSignUp(false);
       return;
     }
 
-    if (email === hardcodedUsername && password === hardcodedPassword) {
-      // Update global auth state
+    // ---------------- Sign In logic ----------------
+    const hardcodedUsername = "dsb";
+    const hardcodedPassword = "1234";
+
+    if (!username.trim() || !password.trim()) {
+      setError("Please enter both username and password.");
+      return;
+    }
+
+    if (username === hardcodedUsername && password === hardcodedPassword) {
       login({
-        name: "Dnyanesh Badave", // or any name you want to show in header
-        email: email
+        name: "Dnyanesh Badave",
+        email: email || "dsb@example.com",
       });
       localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("user", JSON.stringify({ name: "DSB", email: "dsb@example.com" }));
-      // Navigate to dashboard
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ name: "DSB", email: "dsb@example.com" })
+      );
       navigate("/recipe-discovery-dashboard");
     } else {
       setError("Invalid username or password");
     }
   };
 
-
   return (
     <div className="relative min-h-screen flex items-center justify-center">
-      {/* Background Image + Gradient */}
+      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat filter blur-sm"
         style={{ backgroundImage: `url(${heroFood})` }}
       >
-        <div className="absolute inset-0"></div>
-
         <div className="absolute inset-0"></div>
       </div>
 
@@ -72,29 +88,50 @@ const SignIn = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div>
-              <label className="text-sm font-medium block mb-1">Full Name</label>
-              <Input
-                type="text"
-                placeholder="John Doe"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              {/* Full Name */}
+              <div>
+                <label className="text-sm font-medium block mb-1">
+                  Full Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            </>
           )}
 
+          {/* Username */}
           <div>
             <label className="text-sm font-medium block mb-1">Username</label>
             <Input
               type="text"
               placeholder="Enter your username"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
 
+          {/* Email (only in SignUp) */}
+          {isSignUp && (
+            <div>
+              <label className="text-sm font-medium block mb-1">Email</label>
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          {/* Password */}
           <div>
             <label className="text-sm font-medium block mb-1">Password</label>
             <Input
@@ -105,6 +142,22 @@ const SignIn = () => {
               required
             />
           </div>
+
+          {/* Confirm Password (only in SignUp) */}
+          {isSignUp && (
+            <div>
+              <label className="text-sm font-medium block mb-1">
+                Confirm Password
+              </label>
+              <Input
+                type="password"
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
+          )}
 
           {!isSignUp && (
             <div className="flex items-center justify-between">
@@ -128,6 +181,7 @@ const SignIn = () => {
           </Button>
         </form>
 
+        {/* Toggle SignUp / SignIn */}
         <p className="text-sm text-muted-foreground text-center mt-4">
           {isSignUp ? (
             <>
@@ -152,6 +206,7 @@ const SignIn = () => {
           )}
         </p>
 
+        {/* Back to Dashboard */}
         <p className="text-sm text-muted-foreground text-center mt-4">
           Back to{" "}
           <span
