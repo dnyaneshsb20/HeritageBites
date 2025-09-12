@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Icon from "../../components/AppIcon";
+import heroFood from "../../assets/hero-food.jpg";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -30,8 +31,17 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-background">
-      <div className="w-full max-w-md p-6 rounded-lg shadow-md bg-popover border border-border">
+    <div className="relative min-h-screen flex items-center justify-center">
+      {/* Background Image + Gradient */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url(${heroFood})` }}
+      >
+        <div className="absolute inset-0"></div>
+      </div>
+
+      {/* Sign In Card */}
+      <div className="relative z-10 w-full max-w-md p-6 rounded-lg shadow-md bg-popover border border-border">
         <h1 className="text-2xl font-heading font-semibold text-foreground mb-4 flex items-center space-x-2">
           <Icon name="LogIn" size={20} />
           <span>Sign In</span>
@@ -76,7 +86,7 @@ const SignIn = () => {
             </Link>
           </div>
 
-          <Button type="submit" variant="default" size="sm" className="w-full">
+          <Button type="submit" variant="default" size="sm" className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]">
             Sign In
           </Button>
         </form>
@@ -87,9 +97,16 @@ const SignIn = () => {
             Create one
           </Link>
         </p>
+        <p className="text-sm text-muted-foreground text-center mt-4">
+          Back to Dashboard{" "}
+          <Link to="/recipe-discovery-dashboard" className="underline hover:no-underline">
+            Dashboard
+          </Link>
+        </p>
       </div>
     </div>
   );
+
 };
 
 export default SignIn;
