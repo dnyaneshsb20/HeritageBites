@@ -5,9 +5,11 @@ import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Icon from "../../components/AppIcon";
 import heroFood from "../../assets/hero-food.jpg";
+import { useAuth } from "../../context/AuthContext";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false); // toggle state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,26 +20,30 @@ const SignIn = () => {
     e.preventDefault();
     setError("");
 
-    // Basic validation
-    if (isSignUp && !fullName.trim()) {
-      setError("Please enter your full name.");
-      return;
-    }
+    // Hardcoded credentials
+    const hardcodedUsername = "dsb";
+    const hardcodedPassword = "1234";
+
     if (!email.trim() || !password.trim()) {
-      setError("Please enter all required fields.");
+      setError("Please enter both email and password.");
       return;
     }
 
-    if (isSignUp) {
-      console.log("Signing up with", { fullName, email, password });
-      // TODO: call your signup API
+    if (email === hardcodedUsername && password === hardcodedPassword) {
+      // Update global auth state
+      login({
+        name: "Dnyanesh Badave", // or any name you want to show in header
+        email: email
+      });
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("user", JSON.stringify({ name: "DSB", email: "dsb@example.com" }));
+      // Navigate to dashboard
       navigate("/recipe-discovery-dashboard");
     } else {
-      console.log("Signing in with", { email, password });
-      // TODO: call your signin API
-      navigate("/recipe-discovery-dashboard");
+      setError("Invalid username or password");
     }
   };
+
 
   return (
     <div className="relative min-h-screen flex items-center justify-center">
@@ -46,7 +52,7 @@ const SignIn = () => {
         className="absolute inset-0 bg-cover bg-center bg-no-repeat filter blur-sm"
         style={{ backgroundImage: `url(${heroFood})` }}
       >
-      <div className="absolute inset-0"></div>
+        <div className="absolute inset-0"></div>
 
         <div className="absolute inset-0"></div>
       </div>
@@ -79,10 +85,10 @@ const SignIn = () => {
           )}
 
           <div>
-            <label className="text-sm font-medium block mb-1">Email</label>
+            <label className="text-sm font-medium block mb-1">Username</label>
             <Input
-              type="email"
-              placeholder="you@example.com"
+              type="text"
+              placeholder="Enter your username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

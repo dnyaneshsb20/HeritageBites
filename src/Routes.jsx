@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes as RouterRoutes, Route } from "react-router-dom";
+import { Routes as RouterRoutes, Route } from "react-router-dom";
 import ScrollToTop from "components/ScrollToTop";
 import ErrorBoundary from "components/ErrorBoundary";
 import NotFound from "pages/NotFound";
@@ -12,11 +12,9 @@ import RecipeDiscoveryDashboard from './pages/recipe-discovery-dashboard';
 import Dashboard from './pages/dashboard';
 import SignIn from "./pages/sign-in";
 
-
 const Routes = () => {
   return (
-    <BrowserRouter>
-      <ErrorBoundary>
+    <ErrorBoundary>
       <ScrollToTop />
       <RouterRoutes>
         {/* Define your route here */}
@@ -31,8 +29,7 @@ const Routes = () => {
         <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
-      </ErrorBoundary>
-    </BrowserRouter>
+    </ErrorBoundary>
   );
 };
 
