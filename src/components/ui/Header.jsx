@@ -17,27 +17,27 @@ const Header = () => {
   const userMenuRef = useRef(null);
 
   const navigationItems = [
-    { 
-      path: '/recipe-discovery-dashboard', 
-      label: 'Discover', 
+    {
+      path: '/recipe-discovery-dashboard',
+      label: 'Discover',
       icon: 'Search',
       description: 'Explore authentic recipes'
     },
-    { 
-      path: '/ingredient-marketplace', 
-      label: 'Marketplace', 
+    {
+      path: '/ingredient-marketplace',
+      label: 'Marketplace',
       icon: 'ShoppingBag',
       description: 'Source authentic ingredients'
     },
-    { 
-      path: '/user-profile-health-goals', 
-      label: 'Profile', 
+    {
+      path: '/user-profile-health-goals',
+      label: 'Profile',
       icon: 'User',
       description: 'Manage your preferences'
     },
-    { 
-      path: '/recipe-submission-management', 
-      label: 'Contribute', 
+    {
+      path: '/recipe-submission-management',
+      label: 'Contribute',
       icon: 'Plus',
       description: 'Share your recipes'
     }
@@ -99,11 +99,10 @@ const Header = () => {
             <Link
               key={item?.path}
               to={item?.path}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${
-                isActiveRoute(item?.path)
-                  ? 'bg-primary text-primary-foreground shadow-warm'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
+              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${isActiveRoute(item?.path)
+                ? 'bg-primary text-primary-foreground shadow-warm'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                }`}
             >
               <Icon name={item?.icon} size={16} />
               <span>{item?.label}</span>
@@ -136,15 +135,15 @@ const Header = () => {
                     onBlur={handleSearchCollapse}
                     className="w-64 lg:w-80 pl-10"
                   />
-                  <Icon 
-                    name="Search" 
-                    size={16} 
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                  <Icon
+                    name="Search"
+                    size={16}
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                   />
                 </div>
               </form>
             )}
-            
+
             {/* Desktop Search */}
             <form onSubmit={handleSearchSubmit} className="hidden lg:block">
               <div className="relative">
@@ -155,10 +154,10 @@ const Header = () => {
                   onChange={(e) => setSearchQuery(e?.target?.value)}
                   className="w-80 pl-10"
                 />
-                <Icon 
-                  name="Search" 
-                  size={16} 
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" 
+                <Icon
+                  name="Search"
+                  size={16}
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
                 />
               </div>
             </form>
@@ -177,7 +176,7 @@ const Header = () => {
           </Link>
 
           {/* User Menu */}
-          <div className="relative" ref={userMenuRef}>
+          {/* <div className="relative" ref={userMenuRef}>
             {isAuthenticated ? (
               <>
                 <Button
@@ -257,6 +256,13 @@ const Header = () => {
                 </Button>
               </div>
             )}
+          </div> */}
+          <div>
+            <Link to="/signin">
+              <Button variant="default" size="sm">
+                Sign In
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
@@ -267,10 +273,9 @@ const Header = () => {
             <Link
               key={item?.path}
               to={item?.path}
-              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all duration-200 ${
-                isActiveRoute(item?.path)
-                  ? 'text-primary' :'text-muted-foreground hover:text-foreground'
-              }`}
+              className={`flex flex-col items-center space-y-1 px-3 py-2 rounded-lg transition-all duration-200 ${isActiveRoute(item?.path)
+                ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                }`}
             >
               <Icon name={item?.icon} size={20} />
               <span className="text-xs font-caption font-medium">{item?.label}</span>
