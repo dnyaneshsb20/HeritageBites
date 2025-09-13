@@ -1,19 +1,59 @@
+import { useEffect } from "react";
 import Button from '../../../components/ui/Button';
-import { Search, Sparkles, Map } from "lucide-react";
+import { Search, Sparkles } from "lucide-react";
 import heroFood from "../../../assets/hero-food.jpg";
 import { MdExplore } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const PLACEHOLDER_WORDS = [
+      "Discover authentic Indian sweets from every region",
+      "Explore regional traditional dishes made with care",
+      "Find local spices and ingredients for your recipes",
+      "Search for heritage recipes and flavors passed down generations",
+    ];
+
+    const placeholderText = document.getElementById("placeholder-text");
+    const input = document.getElementById("search-input");
+    const placeholderWrapper = document.getElementById("search-placeholder");
+
+    let wordIndex = 0;
+    let charIndex = 0;
+
+    const typeWord = () => {
+      const word = PLACEHOLDER_WORDS[wordIndex];
+      placeholderText.textContent = word.slice(0, charIndex + 1);
+      charIndex++;
+
+      if (charIndex < word.length) {
+        setTimeout(typeWord, 100); // typing speed
+      } else {
+        // pause before next word
+        setTimeout(() => {
+          charIndex = 0;
+          wordIndex = (wordIndex + 1) % PLACEHOLDER_WORDS.length;
+          typeWord();
+        }, 2000);
+      }
+    };
+
+    typeWord();
+
+    input.addEventListener("input", (e) => {
+      placeholderWrapper.style.display = e.target.value ? "none" : "block";
+    });
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${heroFood})` }}
       >
-        {/*<div className="absolute inset-0 bg-gradient-to-r from-deep-red/80 via-saffron/60 to-transparent"></div>*/}
         <div className="absolute inset-0 bg-gradient-to-r from-deep-red/80 to-transparent"></div>
       </div>
 
@@ -26,25 +66,35 @@ const Hero = () => {
               Indigenous Flavors
             </span>
           </h1>
-          
+
           <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
-            Explore authentic regional recipes, connect with local farmers, 
+            Explore authentic regional recipes, connect with local farmers,
             and nourish your body with traditional wisdom
           </p>
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto mb-8">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
+            <div className="relative w-full">
+              {/* Placeholder */}
+              <span
+                id="search-placeholder"
+                className="absolute left-12 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none opacity-50 z-20"
+              >
+                <span id="placeholder-text"></span>
+              </span>
+
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5 z-20" />
+
               <input
                 type="text"
-                placeholder="Search for recipes, ingredients, or regions..."
-                className="w-full pl-12 pr-4 py-4 rounded-full bg-white/95 backdrop-blur-sm text-foreground placeholder:text-muted-foreground border-0 text-lg shadow-warm focus:ring-2 focus:ring-golden focus:outline-none"
+                id="search-input"
+                className="w-full pl-12 pr-4 py-4 rounded-full bg-white/95 backdrop-blur-sm text-foreground placeholder:text-transparent border-0 text-lg shadow-warm focus:ring-2 focus:ring-golden focus:outline-none relative z-10"
               />
-              <Button 
-                variant="hero" 
-                size="lg" 
-                className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff] absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
+
+              <Button
+                variant="hero"
+                size="lg"
+                className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff] absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full z-20"
               >
                 Search
               </Button>
@@ -57,12 +107,8 @@ const Hero = () => {
               <Sparkles className="mr-2 h-5 w-5" />
               Suggest a Dish for Me
             </Button>
-            {/*<Button variant="golden" size="lg" className="min-w-48 bg-[#F9BC06]">
-              <Map className="mr-2 h-5 w-5" />
-              Explore by Region
-            </Button>*/}
             <Button variant="golden" size="lg" className="min-w-48 bg-[#F9BC06]"
-             onClick={() => navigate("/recipe-discovery-dashboard")}>
+              onClick={() => navigate("/recipe-discovery-dashboard")}>
               <MdExplore className="mr-3 h-6 w-6" />
               Explore More
             </Button>
