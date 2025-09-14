@@ -58,7 +58,7 @@ export default {
         warning: {
           DEFAULT: "var(--color-warning)", /* golden amber */
           foreground: "var(--color-warning-foreground)", /* white */
-        },  
+        },
         error: {
           DEFAULT: "var(--color-error)", /* clear red */
           foreground: "var(--color-error-foreground)", /* white */
@@ -116,6 +116,10 @@ export default {
           "0%": { opacity: "1" },
           "100%": { opacity: "0" },
         },
+        "spin-gemini": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -126,6 +130,7 @@ export default {
         "slide-in-from-right": "slide-in-from-right 0.3s ease-out",
         "fade-in": "fade-in 0.2s ease-out",
         "fade-out": "fade-out 0.2s ease-out",
+        "spin-gemini": "spin-gemini 3s ease-in-out infinite",
       },
       spacing: {
         '18': '4.5rem',
