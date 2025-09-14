@@ -103,12 +103,25 @@ const Hero = () => {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button variant="hero" size="lg" className="min-w-48 bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]">
-              <Sparkles className="mr-2 h-5 w-5" />
-              Suggest a Dish for Me
+            {/* Suggest a Dish Button */}
+            <Button
+              variant="hero"
+              size="lg"
+              className="min-w-48 bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff] group relative"
+            >
+              <span className="relative inline-flex items-center">
+                <Sparkles className="mr-2 h-5 w-5 group-hover:animate-spin-gemini drop-shadow-[0_0_6px_rgba(255,200,100,0.7)]" />
+                Suggest a Dish for Me
+              </span>
             </Button>
-            <Button variant="golden" size="lg" className="min-w-48 bg-[#F9BC06]"
-              onClick={() => navigate("/recipe-discovery-dashboard")}>
+
+            {/* Explore More Button */}
+            <Button
+              variant="golden"
+              size="lg"
+              className="min-w-48 bg-[#F9BC06]"
+              onClick={() => navigate("/recipe-discovery-dashboard")}
+            >
               <MdExplore className="mr-3 h-6 w-6" />
               Explore More
             </Button>
