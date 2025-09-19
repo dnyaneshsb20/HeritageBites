@@ -1,86 +1,159 @@
-import React, { useState } from "react";
+// src/pages/ai-suggestions/index.jsx
+import React, { useState, useRef, useEffect } from "react";
 import Button from "../../components/ui/Button";
 import Input from "../../components/ui/Input";
 import Icon from "../../components/AppIcon";
 
 const AISuggestions = () => {
   const [messages, setMessages] = useState([
-    { role: "ai", text: "👋 Hi! Tell me what ingredients you have, and I’ll suggest a dish for you." }
+    {
+      role: "ai",
+      text: "👋 Hi! Tell me what ingredients you have, and I’ll suggest a dish for you.",
+    },
   ]);
   const [query, setQuery] = useState("");
+  const chatEndRef = useRef(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const handleAskAI = (e) => {
     e.preventDefault();
-    if (!query.trim()) return;
+    const text = query.trim();
+    if (!text) return;
 
     // Add user message
-    const newMessages = [...messages, { role: "user", text: query }];
-    setMessages(newMessages);
+    setMessages((prev) => [...prev, { role: "user", text }]);
+    setQuery("");
 
-    // Simulated AI response (replace with API call later)
+    // Simulated AI reply
     setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { role: "ai", text: `🍲 Based on "${query}", I suggest Paneer Butter Masala with Naan.` }
+        {
+          role: "ai",
+          text: `🍲 Based on "${text}", I suggest Paneer Butter Masala with Naan.`,
+        },
       ]);
-    }, 600);
-
-    setQuery("");
+    }, 700);
   };
 
+  // Auto scroll down when new message
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   return (
-    <div className="flex flex-col h-screen bg-background">
-      {/* Header */}
-      <div className="p-4 border-b border-border bg-popover shadow-sm flex items-center space-x-2">
-        <Icon name="Sparkles" size={22} className="text-[#f87d46]" />
-        <h1 className="text-xl font-semibold text-foreground">
-          AI Recipe Assistant
-        </h1>
-      </div>
-
-      {/* Chat Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#FFFDF9]">
-        {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`max-w-[75%] px-4 py-2 rounded-2xl text-sm shadow 
-                ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white rounded-br-sm"
-                    : "bg-[#FFF7E6] border border-[#F9BC06] text-foreground rounded-bl-sm"
-                }`}
-            >
-              {msg.text}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Input Area */}
-      <form
-        onSubmit={handleAskAI}
-        className="p-4 border-t border-border bg-popover flex gap-2"
+    <div className="flex h-screen bg-background text-foreground">
+      {/* Sidebar */}
+      <aside
+        className={`${isSidebarOpen ? "w-64" : "w-16"
+          } bg-popover border-r border-border flex flex-col transition-all duration-300`}
       >
-        <Input
-          type="text"
-          placeholder="Type your ingredients or mood..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="flex-1"
-        />
-        <Button
-          type="submit"
-          variant="hero"
-          className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
+        {/* Sidebar Header */}
+        <div className="flex flex-col items-start gap-1 p-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
+              <Icon name="ChefHat" size={20} color="white" />
+            </div>
+            <span className="text-xl font-heading font-semibold text-foreground">
+              DishCover
+              <h1 className="text-sm font-semibold text-foreground/80">
+                AI Recipe Assistant
+              </h1>
+            </span>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between p-4 border-b border-border">
+          <h2
+            className={`font-semibold text-lg ${!isSidebarOpen && "hidden"
+              } md:block`}
+          >
+            Chats
+          </h2>
+          <button
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="text-sm px-2 py-1 border rounded"
+          >
+            {isSidebarOpen ? "<" : ">"}
+          </button>
+        </div>
+
+        {/* Sidebar Items */}
+        <div className="flex-1 overflow-y-auto p-2 space-y-2">
+          <button className="w-full text-left px-3 py-2 rounded hover:bg-muted">
+            🍳 New Chat
+          </button>
+          <button className="w-full text-left px-3 py-2 rounded hover:bg-muted">
+            📖 Saved Recipes
+          </button>
+          <button className="w-full text-left px-3 py-2 rounded hover:bg-muted">
+            ⚙️ Settings
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Chat Area */}
+      <div className="flex flex-col flex-1">
+        {/* Header */}
+        <header className="p-4 border-b border-border bg-popover flex items-center gap-3">
+          <Icon name="Sparkles" size={20} />
+          <h1 className="text-lg font-semibold">AI Recipe Assistant</h1>
+        </header>
+
+        {/* Chat Messages */}
+        <main className="flex-1 overflow-y-auto px-4 py-6 bg-[#FFFDF9]">
+          <div className="max-w-4xl mx-auto space-y-4">
+            {messages.map((m, i) => (
+              <div
+                key={i}
+                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"
+                  }`}
+              >
+                <div
+                  className={`${m.role === "user" ? "ml-4" : "mr-4"
+                    } ${m.role === "user"
+                      ? "w-full sm:w-10/12 md:w-8/12 lg:w-6/12"
+                      : "w-full sm:w-11/12 md:w-9/12 lg:w-7/12"
+                    }`}
+                >
+                  <div
+                    className={`px-4 py-3 rounded-2xl text-base shadow
+                      ${m.role === "user"
+                        ? "bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white"
+                        : "bg-[#FFF7E6] border border-[#F9BC06] text-foreground"
+                      }`}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div ref={chatEndRef} />
+          </div>
+        </main>
+
+        {/* Input Bar */}
+        <form
+          onSubmit={handleAskAI}
+          className="p-4 border-t border-border bg-popover"
         >
-          Send
-        </Button>
-      </form>
+          <div className="max-w-4xl mx-auto flex gap-2">
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Type your ingredients or mood..."
+              className="flex-1 min-w-[500px] h-12 px-4 py-3 rounded-xl border border-border"
+            />
+            <Button
+              type="submit"
+              variant="hero"
+              className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
+            >
+              Send
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
