@@ -108,6 +108,7 @@ const Hero = () => {
               variant="hero"
               size="lg"
               className="min-w-48 bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff] group relative"
+              onClick={() => navigate("/ai-suggestions")}
             >
               <span className="relative inline-flex items-center">
                 <Sparkles className="mr-2 h-5 w-5 group-hover:animate-spin-gemini drop-shadow-[0_0_6px_rgba(255,200,100,0.7)]" />
