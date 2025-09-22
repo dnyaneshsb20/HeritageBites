@@ -17,6 +17,7 @@ const Header = () => {
   const location = useLocation();
   const searchRef = useRef(null);
   const userMenuRef = useRef(null);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
 
   const navigationItems = [
     {
@@ -35,25 +36,31 @@ const Header = () => {
       path: '/user-profile-health-goals',
       label: 'Profile',
       icon: 'User',
-      description: 'Manage your preferences'
+      description: 'Manage your preferences',
+      protected: true // mark as protected
     },
     {
       path: '/recipe-submission-management',
       label: 'Contribute',
       icon: 'Plus',
-      description: 'Share your recipes'
+      description: 'Share your recipes',
+      protected: true // mark as protected
     }
   ];
 
-  const isActiveRoute = (path) => {
-    return location?.pathname === path;
+  const isActiveRoute = (path) => location?.pathname === path;
+
+  const handleProtectedNavigation = (path) => {
+    if (!isAuthenticated) {
+      setShowAuthPopup(true); // show popup
+      return;
+    }
+    navigate(path);
   };
 
   const handleSearchSubmit = (e) => {
     e?.preventDefault();
-    if (searchQuery?.trim()) {
-      console.log('Searching for:', searchQuery);
-    }
+    if (searchQuery?.trim()) console.log('Searching for:', searchQuery);
   };
 
   const handleSearchExpand = () => {
@@ -62,14 +69,10 @@ const Header = () => {
   };
 
   const handleSearchCollapse = () => {
-    if (!searchQuery?.trim()) {
-      setIsSearchExpanded(false);
-    }
+    if (!searchQuery?.trim()) setIsSearchExpanded(false);
   };
 
-  const toggleUserMenu = () => {
-    setIsUserMenuOpen(!isUserMenuOpen);
-  };
+  const toggleUserMenu = () => setIsUserMenuOpen(!isUserMenuOpen);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -77,7 +80,6 @@ const Header = () => {
         setIsUserMenuOpen(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
@@ -98,17 +100,31 @@ const Header = () => {
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center space-x-1">
           {navigationItems?.map((item) => (
-            <Link
-              key={item?.path}
-              to={item?.path}
-              className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${isActiveRoute(item?.path)
-                ? 'bg-primary text-primary-foreground shadow-warm'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                }`}
-            >
-              <Icon name={item?.icon} size={16} />
-              <span>{item?.label}</span>
-            </Link>
+            item.protected ? (
+              <button
+                key={item?.path}
+                onClick={() => handleProtectedNavigation(item?.path)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${isActiveRoute(item?.path)
+                  ? 'bg-primary text-primary-foreground shadow-warm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+              >
+                <Icon name={item?.icon} size={16} />
+                <span>{item?.label}</span>
+              </button>
+            ) : (
+              <Link
+                key={item?.path}
+                to={item?.path}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-body font-medium transition-all duration-200 ${isActiveRoute(item?.path)
+                  ? 'bg-primary text-primary-foreground shadow-warm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                  }`}
+              >
+                <Icon name={item?.icon} size={16} />
+                <span>{item?.label}</span>
+              </Link>
+            )
           ))}
         </nav>
 
@@ -166,18 +182,19 @@ const Header = () => {
           </div>
 
           {/* Shopping Cart */}
-          <Link to="/ingredient-marketplace" className="relative">
-            <Button variant="ghost" size="icon">
-              <Icon name="ShoppingCart" size={20} />
-              {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs font-caption font-medium rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemCount}
-                </span>
-              )}
-            </Button>
-          </Link>
+          {isAuthenticated && (
+            <Link to="/ingredient-marketplace" className="relative">
+              <Button variant="ghost" size="icon">
+                <Icon name="ShoppingCart" size={20} />
+                {cartItemCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs font-caption font-medium rounded-full w-5 h-5 flex items-center justify-center">
+                    {cartItemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+          )}
 
-          {/* User Menu */}
           {/* User Menu */}
           <div className="relative" ref={userMenuRef}>
             {isAuthenticated ? (
@@ -206,22 +223,21 @@ const Header = () => {
                     </div>
 
                     <div className="py-2">
-                      <Link
-                        to="/user-profile-health-goals"
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
+                      <button
+                        onClick={() => handleProtectedNavigation("/user-profile-health-goals")}
+                        className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors w-full text-left"
                       >
                         <Icon name="User" size={16} />
                         <span>Profile & Goals</span>
-                      </Link>
-                      <Link
-                        to="/recipe-submission-management"
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
+                      </button>
+
+                      <button
+                        onClick={() => handleProtectedNavigation("/recipe-submission-management")}
+                        className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors w-full text-left"
                       >
                         <Icon name="BookOpen" size={16} />
                         <span>My Recipes</span>
-                      </Link>
+                      </button>
                       <Link
                         to="/ingredient-marketplace"
                         className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
@@ -287,6 +303,33 @@ const Header = () => {
           ))}
         </div>
       </nav>
+      {showAuthPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-popover p-6 rounded-lg shadow-lg w-80 text-center">
+            <h2 className="text-lg font-semibold mb-3">You are not signed in</h2>
+            <p className="text-sm text-muted-foreground mb-4">
+              Please sign in to access this section.
+            </p>
+            <div className="flex justify-center space-x-2">
+              <button
+                onClick={() => {
+                  setShowAuthPopup(false);
+                  navigate("/signin");
+                }}
+                className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white px-4 py-2 rounded"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => setShowAuthPopup(false)}
+                className="border border-muted px-4 py-2 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
