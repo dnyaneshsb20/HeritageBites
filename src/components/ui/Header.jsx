@@ -13,11 +13,14 @@ const Header = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const [cartItemCount] = useState(3);
+  const [cartItems, setCartItems] = useState([]); // stores all products added to cart
+  const [cartItemCount, setCartItemCount] = useState(0); // count of items in cart
+  const [isCartOpen, setIsCartOpen] = useState(false); // already exists, keep it
   const location = useLocation();
   const searchRef = useRef(null);
   const userMenuRef = useRef(null);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
+
 
   const navigationItems = [
     {
@@ -83,6 +86,12 @@ const Header = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleAddToCart = (product) => {
+    setCartItems((prev) => [...prev, product]); // add product to cart
+    setCartItemCount((prev) => prev + 1);       // update count
+    setIsCartOpen(true);                        // optional: open cart modal when added
+  };
 
   return (
     <header className="sticky top-0 z-100 bg-background border-b border-border shadow-warm">
@@ -183,8 +192,12 @@ const Header = () => {
 
           {/* Shopping Cart */}
           {isAuthenticated && (
-            <Link to="/ingredient-marketplace" className="relative">
-              <Button variant="ghost" size="icon">
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsCartOpen(true)} // ✅ open modal
+              >
                 <Icon name="ShoppingCart" size={20} />
                 {cartItemCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-accent text-accent-foreground text-xs font-caption font-medium rounded-full w-5 h-5 flex items-center justify-center">
@@ -192,7 +205,7 @@ const Header = () => {
                   </span>
                 )}
               </Button>
-            </Link>
+            </div>
           )}
 
           {/* User Menu */}
@@ -325,6 +338,69 @@ const Header = () => {
                 className="border border-muted px-4 py-2 rounded"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Shopping Cart Modal */}
+      {isCartOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
+          <div className="bg-popover p-6 rounded-lg shadow-lg w-[400px] max-h-[80vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Your Cart</h2>
+              <button
+                onClick={() => setIsCartOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Cart Items Placeholder */}
+            <div className="space-y-4">
+              {cartItems.length === 0 ? (
+                <p className="text-sm text-muted-foreground">Your cart is empty.</p>
+              ) : (
+                cartItems.map((item, index) => (
+                  <div key={index} className="flex justify-between items-center border-b border-border pb-2">
+                    <div className="flex items-center space-x-2">
+                      <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded" />
+                      <div>
+                        <p className="text-sm font-medium">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">Qty: 1</p>
+                      </div>
+                    </div>
+                    <span className="text-sm font-medium">
+                      {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(item.price)}
+                    </span>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="mt-6 flex justify-between items-center">
+              <span className="font-medium">
+                Total: {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(cartItems.reduce((acc, item) => acc + item.price, 0))}
+              </span>
+              <button
+                onClick={() => {
+                  if (cartItemCount > 0) {
+                    setIsCartOpen(false);
+                    navigate("/checkout");
+                  }
+                }}
+                disabled={cartItemCount === 0}
+                className={`px-4 py-2 rounded transition-colors
+    ${cartItemCount === 0
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white hover:opacity-90"
+                  }`}
+              >
+                Checkout
               </button>
             </div>
           </div>

@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
+import { useAuth } from '../../../context/AuthContext';
+import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ product, onAddToCart, onToggleWishlist, onProductClick }) => {
   const [isWishlisted, setIsWishlisted] = useState(product?.isWishlisted || false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
 
   const handleWishlistToggle = (e) => {
     e?.stopPropagation();
@@ -15,6 +20,13 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, onProductClick })
 
   const handleAddToCart = async (e) => {
     e?.stopPropagation();
+
+    if (!user) {
+      // User not signed in → redirect to sign-in
+      navigate("/signin");
+      return;
+    }
+
     setIsAddingToCart(true);
     await onAddToCart(product);
     setIsAddingToCart(false);
@@ -29,7 +41,7 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, onProductClick })
   };
 
   return (
-    <div 
+    <div
       className="bg-card border border-border rounded-lg overflow-hidden shadow-warm hover:shadow-warm-md transition-all duration-200 cursor-pointer group"
       onClick={() => onProductClick(product)}
     >
@@ -40,15 +52,15 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, onProductClick })
           alt={product?.name}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
         />
-        
+
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
           className="absolute top-2 right-2 p-2 bg-background/80 backdrop-blur-sm rounded-full hover:bg-background transition-colors"
         >
-          <Icon 
-            name={isWishlisted ? "Heart" : "Heart"} 
-            size={16} 
+          <Icon
+            name={isWishlisted ? "Heart" : "Heart"}
+            size={16}
             className={isWishlisted ? "text-accent fill-current" : "text-muted-foreground"}
           />
         </button>
@@ -138,13 +150,12 @@ const ProductCard = ({ product, onAddToCart, onToggleWishlist, onProductClick })
         {/* Stock Status */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${
-              product?.stock > 10 ? 'bg-success' : 
+            <div className={`w-2 h-2 rounded-full ${product?.stock > 10 ? 'bg-success' :
               product?.stock > 0 ? 'bg-warning' : 'bg-destructive'
-            }`} />
+              }`} />
             <span className="text-sm text-muted-foreground">
-              {product?.stock > 10 ? 'In Stock' : 
-               product?.stock > 0 ? `Only ${product?.stock} left` : 'Out of Stock'}
+              {product?.stock > 10 ? 'In Stock' :
+                product?.stock > 0 ? `Only ${product?.stock} left` : 'Out of Stock'}
             </span>
           </div>
         </div>
