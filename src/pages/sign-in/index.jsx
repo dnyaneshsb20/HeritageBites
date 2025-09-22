@@ -33,18 +33,40 @@ const SignIn = () => {
       }
       try {
         // Insert new user into users table
-        const { data, error } = await supabase
+        // 1️⃣ Create Supabase Auth user
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+
+        if (authError) {
+          setError(authError.message);
+          return;
+        }
+
+        // 2️⃣ Insert extra info into users table
+        const { data, error: insertError } = await supabase
           .from("users")
           .insert([
             {
+              user_id: authData.user.id, // use the Auth user's id
               name: fullName,
-              email: email,
-              password_hash: password, // ⚠️ In real apps, hash before storing
-              role: "user",            // default role
+              email,
+              role: "user", // default role
             },
           ])
           .select()
-          .single(); // get the inserted row back
+          .single();
+
+        if (insertError) {
+          setError(insertError.message);
+          return;
+        }
+
+        console.log("New user created:", data);
+        alert("Account created! Now you can log in.");
+        setIsSignUp(false);
+        // get the inserted row back
 
         if (error) {
           setError(error.message);
@@ -67,28 +89,37 @@ const SignIn = () => {
     }
 
     try {
-      const { data: user, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .eq("password_hash", password) // ⚠️ In real apps hash + compare
-        .single();
-
-      if (error || !user) {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (!data.user) {
         setError("Invalid email or password.");
         return;
       }
 
-      // Login success
-      login(user);
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem("user", JSON.stringify(user));
+      // Fetch extra profile info from your 'users' table
+      const { data: profile, error: profileError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("user_id", data.user.id)
+        .single();
 
-      if (user.role === "admin") {
+      if (profileError) {
+        console.error(profileError);
+      }
+
+      // Login success
+      login(profile || data.user);
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem("user", JSON.stringify(profile || data.user));
+
+      if (profile?.role === "admin") {
         navigate("/admin-recipe-management");
       } else {
         navigate("/recipe-discovery-dashboard");
       }
+
     } catch (err) {
       console.error(err);
       setError("Something went wrong. Please try again.");
