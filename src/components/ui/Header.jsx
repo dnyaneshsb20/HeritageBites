@@ -230,14 +230,16 @@ const Header = () => {
                         <Icon name="Package" size={16} />
                         <span>Order History</span>
                       </Link>
-                      <Link
-                        to="/admin-recipe-management"
-                        className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
-                        onClick={() => setIsUserMenuOpen(false)}
-                      >
-                        <Icon name="Settings" size={16} />
-                        <span>Admin Panel</span>
-                      </Link>
+                      {user?.role === "admin" && (
+                        <Link
+                          to="/admin-recipe-management"
+                          className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <Icon name="Settings" size={16} />
+                          <span>Admin Panel</span>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="border-t border-border py-2">

@@ -13,11 +13,11 @@ const SignIn = () => {
   const [isSignUp, setIsSignUp] = useState(false); // toggle state
 
   // form states
-  const [fullName, setFullName] = useState(""); 
-  const [username, setUsername] = useState(""); 
-  const [email, setEmail] = useState(""); 
-  const [password, setPassword] = useState(""); 
-  const [confirmPassword, setConfirmPassword] = useState(""); 
+  const [fullName, setFullName] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
 
@@ -41,6 +41,11 @@ const SignIn = () => {
     // ---------------- Sign In logic ----------------
     const hardcodedUsername = "dsb";
     const hardcodedPassword = "1234";
+    const hardcodedAdmin = {
+      username: "admin",
+      password: "admin1234",
+    };
+
 
     if (!username.trim() || !password.trim()) {
       setError("Please enter both username and password.");
@@ -58,6 +63,30 @@ const SignIn = () => {
         JSON.stringify({ name: "DSB", email: "dsb@example.com" })
       );
       navigate("/recipe-discovery-dashboard");
+    } else {
+      setError("Invalid username or password");
+    }
+    // Admin login check
+    if (username === hardcodedAdmin.username && password === hardcodedAdmin.password) {
+      // Login as admin
+      login({
+        name: "Admin User",
+        email: "admin@example.com",
+        role: "admin", // important to mark user as admin
+      });
+
+      localStorage.setItem("isAuthenticated", "true");
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: "Admin User",
+          email: "admin@example.com",
+          role: "admin",
+        })
+      );
+
+      navigate("/admin-recipe-management"); // redirect admin to the admin page
+      return; // stop further checks
     } else {
       setError("Invalid username or password");
     }
