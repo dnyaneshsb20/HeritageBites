@@ -6,6 +6,7 @@ import Input from "../../components/ui/Input";
 import Icon from "../../components/AppIcon";
 import heroFood from "../../assets/hero-food.jpg";
 import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../supabaseClient"; // adjust path if needed
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -14,14 +15,13 @@ const SignIn = () => {
 
   // form states
   const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -31,64 +31,67 @@ const SignIn = () => {
         setError("Passwords do not match.");
         return;
       }
-      console.log("Sign Up Data:", { fullName, username, email, password });
-      // TODO: send signup data to backend / supabase
-      alert("Account created! Now you can log in.");
-      setIsSignUp(false);
+      try {
+        // Insert new user into users table
+        const { data, error } = await supabase
+          .from("users")
+          .insert([
+            {
+              name: fullName,
+              email: email,
+              password_hash: password, // ⚠️ In real apps, hash before storing
+              role: "user",            // default role
+            },
+          ])
+          .select()
+          .single(); // get the inserted row back
+
+        if (error) {
+          setError(error.message);
+          return;
+        }
+
+        console.log("New user inserted:", data);
+        alert("Account created! Now you can log in.");
+        setIsSignUp(false);
+
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong. Please try again.");
+      }
+    }
+
+    if (!email.trim() || !password.trim()) {
+      setError("Please enter both email and password.");
       return;
     }
 
-    // ---------------- Sign In logic ----------------
-    const hardcodedUsername = "dsb";
-    const hardcodedPassword = "1234";
-    const hardcodedAdmin = {
-      username: "admin",
-      password: "admin1234",
-    };
+    try {
+      const { data: user, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", email)
+        .eq("password_hash", password) // ⚠️ In real apps hash + compare
+        .single();
 
+      if (error || !user) {
+        setError("Invalid email or password.");
+        return;
+      }
 
-    if (!username.trim() || !password.trim()) {
-      setError("Please enter both username and password.");
-      return;
-    }
-
-    if (username === hardcodedUsername && password === hardcodedPassword) {
-      login({
-        name: "Dnyanesh Badave",
-        email: email || "dsb@example.com",
-      });
+      // Login success
+      login(user);
       localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ name: "DSB", email: "dsb@example.com" })
-      );
-      navigate("/recipe-discovery-dashboard");
-    } else {
-      setError("Invalid username or password");
-    }
-    // Admin login check
-    if (username === hardcodedAdmin.username && password === hardcodedAdmin.password) {
-      // Login as admin
-      login({
-        name: "Admin User",
-        email: "admin@example.com",
-        role: "admin", // important to mark user as admin
-      });
+      localStorage.setItem("user", JSON.stringify(user));
 
-      localStorage.setItem("isAuthenticated", "true");
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin",
-        })
-      );
-
-      navigate("/admin-recipe-management"); // redirect admin to the admin page
-      return; // stop further checks
-    } else {
-      setError("Invalid username or password");
+      if (user.role === "admin") {
+        navigate("/admin-recipe-management");
+      } else {
+        navigate("/recipe-discovery-dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
     }
   };
 
@@ -117,48 +120,31 @@ const SignIn = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <>
-              {/* Full Name */}
-              <div>
-                <label className="text-sm font-medium block mb-1">
-                  Full Name
-                </label>
-                <Input
-                  type="text"
-                  placeholder="John Doe"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
-            </>
-          )}
-
-          {/* Username */}
-          <div>
-            <label className="text-sm font-medium block mb-1">Username</label>
-            <Input
-              type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Email (only in SignUp) */}
-          {isSignUp && (
             <div>
-              <label className="text-sm font-medium block mb-1">Email</label>
+              <label className="text-sm font-medium block mb-1">
+                Full Name
+              </label>
               <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Enter Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
               />
             </div>
           )}
+
+          {/* Email (always visible) */}
+          <div>
+            <label className="text-sm font-medium block mb-1">Email</label>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
           {/* Password */}
           <div>

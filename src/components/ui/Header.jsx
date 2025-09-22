@@ -5,6 +5,7 @@ import Button from './Button';
 import Input from './Input';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import { supabase } from "../../supabaseClient"; // make sure this points to your Supabase client
 
 const Header = () => {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ const Header = () => {
   const searchRef = useRef(null);
   const userMenuRef = useRef(null);
   const [showAuthPopup, setShowAuthPopup] = useState(false);
-
+  const [userProfile, setUserProfile] = useState(null); // fetched from Supabase
 
   const navigationItems = [
     {
@@ -92,6 +93,44 @@ const Header = () => {
     setCartItemCount((prev) => prev + 1);       // update count
     setIsCartOpen(true);                        // optional: open cart modal when added
   };
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      // Get the current auth user
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+
+      if (authError || !authUser) {
+        console.error("Error getting auth user:", authError);
+        return;
+      }
+
+      console.log("Auth user id:", authUser.id, "email:", authUser.email);
+
+      // Fetch user profile from your users table
+      const { data, error } = await supabase
+        .from("users")
+        .select("user_id, name, email, role, location")
+        .eq("user_id", authUser.id) // Match by user_id
+        .single();
+
+      if (error) {
+        console.warn("No row found in users table, using Auth info");
+        // fallback: use Auth info
+        setUserProfile({
+          name: authUser.email.split("@")[0], // default name from email
+          email: authUser.email,
+          role: "user",
+          user_id: authUser.id,
+        });
+      } else {
+        setUserProfile(data);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+
 
   return (
     <header className="sticky top-0 z-100 bg-background border-b border-border shadow-warm">
@@ -228,11 +267,16 @@ const Header = () => {
                   <div className="absolute right-0 mt-2 w-56 bg-popover border border-border rounded-lg shadow-warm-lg z-50">
                     <div className="p-3 border-b border-border">
                       <p className="font-body font-medium text-foreground">
-                        {user?.name || "Guest User"}
+                        {userProfile?.name}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {user?.email || "guest@example.com"}
+                        {userProfile?.email}
                       </p>
+                      {userProfile?.role && (
+                        <p className="text-xs text-accent font-medium mt-1">
+                          {userProfile.role === "admin" ? "Administrator" : userProfile.role}
+                        </p>
+                      )}
                     </div>
 
                     <div className="py-2">
@@ -259,7 +303,7 @@ const Header = () => {
                         <Icon name="Package" size={16} />
                         <span>Order History</span>
                       </Link>
-                      {user?.role === "admin" && (
+                      {userProfile?.role === "admin" && (
                         <Link
                           to="/admin-recipe-management"
                           className="flex items-center space-x-3 px-3 py-2 text-sm font-body hover:bg-muted transition-colors"
