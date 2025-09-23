@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Icon from '../../../components/AppIcon';
 import Image from '../../../components/AppImage';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
+import { supabase } from '../../../supabaseClient';
 
 const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState(userData);
+  const [formData, setFormData] = useState(userData || {});
+  const [dbUser, setDbUser] = useState(null);
+
 
   const genderOptions = [
     { value: 'male', label: 'Male' },
@@ -40,19 +43,95 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
     }));
   };
 
-  const handleSave = () => {
-    onUpdate(formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      // Get the signed-in user
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError || !authData?.user) {
+        console.error("No authenticated user found:", authError);
+        return;
+      }
+
+      const userId = authData.user.id;
+
+      // Update the users table
+      const { error } = await supabase
+        .from("users")
+        .update({
+          name: formData.name,
+          email: formData.email,
+          location: formData.location,
+        })
+        .eq("user_id", userId);
+
+      if (error) {
+        console.error("Error updating profile:", error);
+        return;
+      }
+
+      // Call parent update and exit edit mode
+      onUpdate(formData);
+      setIsEditing(false);
+    } catch (err) {
+      console.error("Unexpected error while saving profile:", err);
+    }
   };
 
   const handleCancel = () => {
-    setFormData(userData);
+    // revert to the latest fetched DB data (name + email) merged with original userData
+    if (dbUser) {
+      setFormData(prev => ({
+        ...userData,
+        // override name/email from dbUser
+        name: dbUser.name,
+        email: dbUser.email
+      }));
+    } else {
+      setFormData(userData);
+    }
     setIsEditing(false);
   };
 
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchSignedInUser = async () => {
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const user = authData?.user;
+
+        if (!user) return;
+
+        const { data, error } = await supabase
+          .from('users')
+          .select('name, email, created_at')
+          .eq('user_id', user.id)
+          .single();
+
+        if (!error && data && mounted) {
+          setDbUser(data);
+          setFormData(prev => ({
+            ...prev,
+            name: data.name,
+            email: data.email,
+            joinDate: data.created_at
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching user data:', err);
+      }
+    };
+
+    fetchSignedInUser();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
     <div className="bg-card rounded-lg border border-border shadow-warm">
-      <div 
+      <div
         className="flex items-center justify-between p-6 cursor-pointer"
         onClick={onToggle}
       >
@@ -69,10 +148,10 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
             </p>
           </div>
         </div>
-        <Icon 
-          name={isExpanded ? "ChevronUp" : "ChevronDown"} 
-          size={20} 
-          className="text-muted-foreground" 
+        <Icon
+          name={isExpanded ? "ChevronUp" : "ChevronDown"}
+          size={20}
+          className="text-muted-foreground"
         />
       </div>
       {isExpanded && (
@@ -103,7 +182,7 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
                   {formData?.name}
                 </h4>
                 <p className="text-sm text-muted-foreground">
-                  Member since {formData?.joinDate}
+                  Member since {formData?.joinDate ? new Date(formData.joinDate).toLocaleDateString() : ''}
                 </p>
               </div>
             </div>
@@ -207,8 +286,8 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
                   </Button>
                 </>
               ) : (
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   onClick={() => setIsEditing(true)}
                   iconName="Edit"
                   iconPosition="left"
