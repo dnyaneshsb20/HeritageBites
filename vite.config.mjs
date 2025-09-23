@@ -5,7 +5,7 @@ import tagger from "@dhiwise/component-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: "./", // ensures assets load correctly on Vercel
+  base: "/", // ensures assets load correctly on Vercel
   build: {
     outDir: "build", // output folder
     chunkSizeWarningLimit: 2000
