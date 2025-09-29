@@ -35,7 +35,6 @@ const SignIn = () => {
       }
       try {
         // Insert new user into users table
-        // 1️⃣ Create Supabase Auth user
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
@@ -46,15 +45,14 @@ const SignIn = () => {
           return;
         }
 
-        // 2️⃣ Insert extra info into users table
         const { data, error: insertError } = await supabase
           .from("users")
           .insert([
             {
-              user_id: authData.user.id, // use the Auth user's id
+              user_id: authData.user.id,
               name: fullName,
               email,
-              role: "user", // default role
+              role: "user",
             },
           ])
           .select()
@@ -66,16 +64,6 @@ const SignIn = () => {
         }
 
         console.log("New user created:", data);
-        alert("Account created! Now you can log in.");
-        setIsSignUp(false);
-        // get the inserted row back
-
-        if (error) {
-          setError(error.message);
-          return;
-        }
-
-        console.log("New user inserted:", data);
         alert("Account created! Now you can log in.");
         setIsSignUp(false);
 
@@ -100,7 +88,6 @@ const SignIn = () => {
         return;
       }
 
-      // Fetch extra profile info from your 'users' table
       const { data: profile, error: profileError } = await supabase
         .from("users")
         .select("*")
@@ -111,7 +98,6 @@ const SignIn = () => {
         console.error(profileError);
       }
 
-      // Login success
       login(profile || data.user);
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("user", JSON.stringify(profile || data.user));
@@ -151,90 +137,86 @@ const SignIn = () => {
           </div>
         )}
 
-        {showForgot ? (
-          <ForgotPassword onClose={() => setShowForgot(false)} />
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {isSignUp && (
-              <div>
-                <label className="text-sm font-medium block mb-1">
-                  Full Name
-                </label>
-                <Input
-                  type="text"
-                  placeholder="Enter Full Name"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  required
-                />
-              </div>
-            )}
-
-            {/* Email (always visible) */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {isSignUp && (
             <div>
-              <label className="text-sm font-medium block mb-1">Email</label>
+              <label className="text-sm font-medium block mb-1">
+                Full Name
+              </label>
               <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="Enter Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
                 required
               />
             </div>
+          )}
 
-            {/* Password */}
+          {/* Email (always visible) */}
+          <div>
+            <label className="text-sm font-medium block mb-1">Email</label>
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Password */}
+          <div>
+            <label className="text-sm font-medium block mb-1">Password</label>
+            <Input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          {/* Confirm Password (only in SignUp) */}
+          {isSignUp && (
             <div>
-              <label className="text-sm font-medium block mb-1">Password</label>
+              <label className="text-sm font-medium block mb-1">
+                Confirm Password
+              </label>
               <Input
                 type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
+          )}
 
-            {/* Confirm Password (only in SignUp) */}
-            {isSignUp && (
-              <div>
-                <label className="text-sm font-medium block mb-1">
-                  Confirm Password
-                </label>
-                <Input
-                  type="password"
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-            )}
+          {!isSignUp && (
+            <div className="flex items-center justify-between">
+              <label className="flex items-center space-x-2 text-sm">
+                <input type="checkbox" className="accent-primary" />
+                <span>Remember me</span>
+              </label>
+              <span
+                className="text-sm cursor-pointer hover:underline"
+                onClick={() => setShowForgot(true)}
+              >
+                Forgot Password?
+              </span>
+            </div>
+          )}
 
-            {!isSignUp && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center space-x-2 text-sm">
-                  <input type="checkbox" className="accent-primary" />
-                  <span>Remember me</span>
-                </label>
-                <span
-                  className="text-sm cursor-pointer hover:underline"
-                  onClick={() => setShowForgot(true)}
-                >
-                  Forgot Password?
-                </span>
-              </div>
-            )}
-
-            <Button
-              type="submit"
-              variant="default"
-              size="sm"
-              className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
-            >
-              {isSignUp ? "Create Account" : "Sign In"}
-            </Button>
-          </form>
-        )}
+          <Button
+            type="submit"
+            variant="default"
+            size="sm"
+            className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
+          >
+            {isSignUp ? "Create Account" : "Sign In"}
+          </Button>
+        </form>
 
         {/* Toggle SignUp / SignIn */}
         <p className="text-sm text-muted-foreground text-center mt-4">
@@ -272,6 +254,9 @@ const SignIn = () => {
           </span>
         </p>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
     </div>
   );
 };
