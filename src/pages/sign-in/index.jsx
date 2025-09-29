@@ -7,6 +7,7 @@ import Icon from "../../components/AppIcon";
 import heroFood from "../../assets/hero-food.jpg";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../supabaseClient"; // adjust path if needed
+import ForgotPassword from "./components/ForgotPassword";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const SignIn = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [error, setError] = useState("");
+  const [showForgot, setShowForgot] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,83 +151,90 @@ const SignIn = () => {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {isSignUp && (
+        {showForgot ? (
+          <ForgotPassword onClose={() => setShowForgot(false)} />
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {isSignUp && (
+              <div>
+                <label className="text-sm font-medium block mb-1">
+                  Full Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Enter Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+
+            {/* Email (always visible) */}
             <div>
-              <label className="text-sm font-medium block mb-1">
-                Full Name
-              </label>
+              <label className="text-sm font-medium block mb-1">Email</label>
               <Input
-                type="text"
-                placeholder="Enter Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
-          )}
 
-          {/* Email (always visible) */}
-          <div>
-            <label className="text-sm font-medium block mb-1">Email</label>
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="text-sm font-medium block mb-1">Password</label>
-            <Input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          {/* Confirm Password (only in SignUp) */}
-          {isSignUp && (
+            {/* Password */}
             <div>
-              <label className="text-sm font-medium block mb-1">
-                Confirm Password
-              </label>
+              <label className="text-sm font-medium block mb-1">Password</label>
               <Input
                 type="password"
-                placeholder="Re-enter your password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
-          )}
 
-          {!isSignUp && (
-            <div className="flex items-center justify-between">
-              <label className="flex items-center space-x-2 text-sm">
-                <input type="checkbox" className="accent-primary" />
-                <span>Remember me</span>
-              </label>
-              <span className="text-sm cursor-pointer hover:underline">
-                Forgot?
-              </span>
-            </div>
-          )}
+            {/* Confirm Password (only in SignUp) */}
+            {isSignUp && (
+              <div>
+                <label className="text-sm font-medium block mb-1">
+                  Confirm Password
+                </label>
+                <Input
+                  type="password"
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
+                />
+              </div>
+            )}
 
-          <Button
-            type="submit"
-            variant="default"
-            size="sm"
-            className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
-          >
-            {isSignUp ? "Create Account" : "Sign In"}
-          </Button>
-        </form>
+            {!isSignUp && (
+              <div className="flex items-center justify-between">
+                <label className="flex items-center space-x-2 text-sm">
+                  <input type="checkbox" className="accent-primary" />
+                  <span>Remember me</span>
+                </label>
+                <span
+                  className="text-sm cursor-pointer hover:underline"
+                  onClick={() => setShowForgot(true)}
+                >
+                  Forgot Password?
+                </span>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-[#fdfbff]"
+            >
+              {isSignUp ? "Create Account" : "Sign In"}
+            </Button>
+          </form>
+        )}
 
         {/* Toggle SignUp / SignIn */}
         <p className="text-sm text-muted-foreground text-center mt-4">
