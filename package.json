@@ -38,11 +38,15 @@
     "axios": "^1.8.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cors": "^2.8.5",
     "d3": "^7.9.0",
     "date-fns": "^4.1.0",
-    "dotenv": "^16.0.1",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
     "framer-motion": "^10.16.4",
     "lucide-react": "^0.484.0",
+    "nodemailer": "^7.0.6",
+    "pg": "^8.16.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-helmet": "^6.1.0",
@@ -91,5 +95,19 @@
     "tailwindcss": "3.4.6",
     "vite": "^5.4.20",
     "vite-tsconfig-paths": "3.6.0"
-  }
+  },
+  "description": "A modern React-based project utilizing the latest frontend technologies and tools for building responsive web applications.",
+  "main": "postcss.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dnyaneshsb20/HeritageBites.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/dnyaneshsb20/HeritageBites/issues"
+  },
+  "homepage": "https://github.com/dnyaneshsb20/HeritageBites#readme"
 }

@@ -8,6 +8,7 @@ import heroFood from "../../assets/hero-food.jpg";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../supabaseClient"; // adjust path if needed
 import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -22,6 +23,8 @@ const SignIn = () => {
 
   const [error, setError] = useState("");
   const [showForgot, setShowForgot] = useState(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState(""); // store email for reset
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -256,7 +259,22 @@ const SignIn = () => {
       </div>
 
       {/* Forgot Password Modal */}
-      {showForgot && <ForgotPassword onClose={() => setShowForgot(false)} />}
+      {showForgot &&
+        <ForgotPassword
+          onClose={() => setShowForgot(false)}
+          openResetPassword={(email) => {
+            setResetEmail(email);
+            setShowForgot(false);
+            setShowResetPassword(true);
+          }}
+        />
+      }
+      {showResetPassword && (
+        <ResetPassword
+          email={resetEmail}
+          onClose={() => setShowResetPassword(false)}
+        />
+      )}
     </div>
   );
 };
