@@ -25,6 +25,7 @@ const SignIn = () => {
   const [showForgot, setShowForgot] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState(""); // store email for reset
+  const [resetToken, setResetToken] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -262,8 +263,9 @@ const SignIn = () => {
       {showForgot &&
         <ForgotPassword
           onClose={() => setShowForgot(false)}
-          openResetPassword={(email) => {
+          openResetPassword={(email,token) => {
             setResetEmail(email);
+            setResetToken(token);
             setShowForgot(false);
             setShowResetPassword(true);
           }}
@@ -272,6 +274,7 @@ const SignIn = () => {
       {showResetPassword && (
         <ResetPassword
           email={resetEmail}
+          resetToken={resetToken}
           onClose={() => setShowResetPassword(false)}
         />
       )}
