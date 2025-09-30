@@ -11,125 +11,74 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
   const [otp, setOtp] = useState(""); // for user input
   const [step, setStep] = useState(1); // 1 = enter email, 2 = enter OTP
   const [generatedOtp, setGeneratedOtp] = useState(""); // store OTP temporarily (optional)
+const handleSendOtp = async (e) => {
+  e.preventDefault();
+  setError("");
+  setMessage("");
 
-  const handleSendOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
+  if (!email.trim()) {
+    setError("Please enter your email.");
+    return;
+  }
 
-    if (!email.trim()) {
-      setError("Please enter your email.");
+  try {
+    // Call server to generate and send OTP
+    const response = await fetch("http://localhost:5000/sendOtp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      setError(data.error);
       return;
     }
 
-    try {
-      // Check if email exists
-      const { data: user, error: userError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .single();
+    setMessage("OTP sent to your email!");
+    setStep(2); // move to OTP input step
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
-      if (userError || !user) {
-        setError("Email not found.");
-        return;
-      }
 
-      // Generate OTP
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit OTP
-      setGeneratedOtp(newOtp);
+const handleVerifyOtp = async (e) => {
+  e.preventDefault();
+  setError("");
+  setMessage("");
 
-      // Save OTP & expiry in DB (5 min expiry)
-      const expiry = new Date();
-      expiry.setMinutes(expiry.getMinutes() + 5);
+  if (!otp.trim()) {
+    setError("Please enter the OTP.");
+    return;
+  }
 
-      const { error: otpError } = await supabase
-        .from("users")
-        .update({ otp: newOtp, otp_expiry: expiry.toISOString() })
-        .eq("email", email);
+  try {
+    // Call server-side OTP verification
+    const response = await fetch("http://localhost:5001/verifyOtp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
+    });
 
-      if (otpError) {
-        setError("Failed to send OTP. Try again.");
-        return;
-      }
+    const data = await response.json();
 
-      // Send OTP via email (our custom API route)
-      await fetch("http://localhost:5000/sendOtp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, otp: newOtp }),
-      });
-      // const response = await fetch("/api/sendOtp", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({ email: "dnyaneshsb20@gmail.com", otp: "123456" }),
-      // });
-
-      // const data = await response.json();
-      // console.log(data);
-
-      setMessage("OTP sent to your email!");
-      setStep(2); // move to OTP input step
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
-    }
-  };
-
-  const handleVerifyOtp = async (e) => {
-    e.preventDefault();
-    setError("");
-    setMessage("");
-
-    if (!otp.trim()) {
-      setError("Please enter the OTP.");
+    if (data.error) {
+      setError(data.error); // server will return invalid/expired errors
       return;
     }
 
-    try {
-      // Fetch user by email
-      const { data: user, error: userError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .single();
-
-      if (userError || !user) {
-        setError("Email not found.");
-        return;
-      }
-
-      const now = new Date();
-      const expiry = new Date(user.otp_expiry);
-
-      if (user.otp !== otp) {
-        setError("Invalid OTP. Please try again.");
-        return;
-      }
-
-      if (expiry < now) {
-        setError("OTP has expired. Please request a new one.");
-        return;
-      }
-
-      // OTP is valid, clear it from DB
-      await supabase
-        .from("users")
-        .update({ otp: null, otp_expiry: null })
-        .eq("email", email);
-
-      // Move to Reset Password modal
-      onClose(); // close ForgotPassword modal
-      openResetPassword(email);
-      // You will need to open ResetPassword modal here in SignIn.jsx
-      // e.g., call a function passed from SignIn like openResetPassword(email)
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong. Please try again.");
-    }
-  };
+    // OTP verified successfully
+    onClose(); // close ForgotPassword modal
+    openResetPassword(email, data.resetToken); // pass resetToken if needed
+    setMessage("OTP verified successfully!");
+  } catch (err) {
+    console.error(err);
+    setError("Something went wrong. Please try again.");
+  }
+};
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

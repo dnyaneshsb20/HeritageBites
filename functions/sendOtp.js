@@ -47,7 +47,6 @@ async function sendEmail(to, otp) {
 
 app.post("/sendOtp", async (req, res) => {
   try {
-    console.log("Request body:", req.body);
     const { email } = req.body;
     if (!email) return res.status(400).json({ error: "Email is required" });
 
@@ -64,7 +63,7 @@ app.post("/sendOtp", async (req, res) => {
 
     const otp = generateOtp();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000).toISOString();
-
+    console.log("Generated OTP:", otp, "Expiry (UTC):", otpExpiry);
     // Update OTP and expiry in Supabase
     const { error: updateError } = await supabase
       .from("users")

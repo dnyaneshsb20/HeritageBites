@@ -1,11 +1,16 @@
 // functions/verifyOtp.js
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
-import crypto from "crypto";
-import pool from "./db.js";
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const crypto = require("crypto");
+const { createClient } = require("@supabase/supabase-js");
 
 dotenv.config();
+
+const supabase = createClient(
+  process.env.VITE_SUPABASE_URL,
+  process.env.VITE_SUPABASE_ANON_KEY
+);
 
 const app = express();
 app.use(cors());
@@ -21,31 +26,56 @@ app.post("/verifyOtp", async (req, res) => {
     const { email, otp } = req.body;
     if (!email || !otp) return res.status(400).json({ error: "Email and OTP required" });
 
-    // Fetch user
-    const userResult = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (userResult.rowCount === 0) {
+    // Fetch user from Supabase
+    const { data: user, error: fetchError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+
+    if (fetchError || !user) {
       return res.status(404).json({ error: "User not found" });
     }
-
-    const user = userResult.rows[0];
 
     // Check OTP match and expiry
     if (!user.otp || user.otp !== otp) {
       return res.status(400).json({ error: "Invalid OTP" });
     }
 
-    if (new Date() > user.otp_expiry) {
+    const otpExpiry = new Date(user.otp_expiry); // converts DB timestamp to JS Date
+    const now = new Date();
+
+    console.log("Current time:", now.toISOString());
+    console.log("OTP expiry time:", otpExpiry.toISOString());
+    console.log("Verifying OTP for:", email, "OTP entered:", otp);
+    console.log("OTP expiry being saved:", otpExpiry);
+
+
+    if (now > otpExpiry) {
       return res.status(400).json({ error: "OTP expired" });
     }
 
-    // Optional: generate a reset token valid for 15 minutes
-    const resetToken = generateResetToken();
-    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    await pool.query(
-      `UPDATE users SET reset_token = $1, reset_token_expiry = $2, otp = NULL, otp_expiry = NULL WHERE email = $3`,
-      [resetToken, resetTokenExpiry, email]
-    );
+
+    // Generate reset token valid for 15 minutes
+    const resetToken = generateResetToken();
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+
+    // Update user with reset token and clear OTP
+    const { error: updateError } = await supabase
+      .from("users")
+      .update({
+        reset_token: resetToken,
+        reset_token_expiry: resetTokenExpiry,
+        otp: null,
+        otp_expiry: null,
+      })
+      .eq("email", email);
+
+    if (updateError) {
+      console.error("Supabase update error:", updateError);
+      return res.status(500).json({ error: "Failed to update user" });
+    }
 
     res.json({ message: "OTP verified successfully", resetToken });
   } catch (error) {
@@ -54,5 +84,5 @@ app.post("/verifyOtp", async (req, res) => {
   }
 });
 
-const PORT = 5001; // use a different port if needed
+const PORT = 5001;
 app.listen(PORT, () => console.log(`OTP verification server running on port ${PORT}`));
