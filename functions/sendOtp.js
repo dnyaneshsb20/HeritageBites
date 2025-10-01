@@ -33,12 +33,14 @@ async function sendEmail(to, otp) {
     to,
     subject: "Your OTP for Reset Password",
     html: `
-      <h1 style="color:#2563eb;">Heritage Bites Password Reset</h1>
-      <p>Dear User,</p>
-      <p>Your OTP is:</p>
-      <h2 style="color:#dc2626;">${otp}</h2>
-      <p>This OTP is valid for <b>10 minutes</b>.</p>
-      <p>Do not share it with anyone.</p>
+      <div style="font-family: Helvetica, sans-serif; color: #000;">
+        <h1>Heritage Bites Password Reset</h1>
+        <p>Dear User,</p>
+        <p>Your OTP is:</p>
+        <h2 style="color:#DC2626;">${otp}</h2>
+        <p>This OTP is valid for <b>10 minutes</b>.</p>
+        <p>Do not share it with anyone.</p>
+      </div>
     `,
   };
 
