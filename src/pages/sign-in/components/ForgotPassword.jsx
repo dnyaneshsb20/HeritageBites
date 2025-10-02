@@ -9,8 +9,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [otp, setOtp] = useState(""); // for user input
-  const [step, setStep] = useState(1); // 1 = enter email, 2 = enter OTP
-  const [generatedOtp, setGeneratedOtp] = useState(""); // store OTP temporarily (optional)
+  const [step, setStep] = useState(1); // 1 = enter email, 2 = enter OT
   const handleSendOtp = async (e) => {
     e.preventDefault();
     setError("");
@@ -23,11 +22,14 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
 
     try {
       // Call server to generate and send OTP
-      const response = await fetch("https://heritage-bites.vercel.app/api/sendOtp", {
+      const response = await fetch("/api/sendOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+
+      console.log("Response status:", response.status);
+      console.log("Response text:", await response.text());
 
       const data = await response.json().catch(() => ({}));
 
@@ -58,7 +60,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
 
     try {
       // Call server-side OTP verification
-      const response = await fetch("https://heritage-bites.vercel.app/api/verifyOtp", {
+      const response = await fetch("/api/verifyOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -137,7 +139,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
             <Button
               type="button"
               onClick={onClose} // close modal
-              className="flex-1 bg-white text-black Uhover:bg-accent hover:text-accent-foreground"
+              className="flex-1 bg-white text-black hover:bg-accent hover:text-accent-foreground"
             >
               Cancel
             </Button>
