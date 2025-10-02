@@ -48,44 +48,45 @@ const ResetPassword = ({ resetToken, onClose }) => {
   };
 
   return (
-    <div className="p-6 max-w-sm mx-auto bg-popover border border-border rounded-lg shadow-md">
-      <h2 className="text-lg font-semibold mb-4">Reset Password</h2>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="p-6 w-[400px] max-w-3xl bg-popover border border-border rounded-lg shadow-md h-[310px]">
+        <h2 className="text-lg font-semibold mb-4">Enter New Password</h2>
+        {message && <p className="text-green-600 mb-2">{message}</p>}
+        {error && <p className="text-red-600 mb-2">{error}</p>}
 
-      {message && <p className="text-green-600 mb-2">{message}</p>}
-      {error && <p className="text-red-600 mb-2">{error}</p>}
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">New Password</label>
+            <Input
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              required
+            />
+          </div>
 
-      <form onSubmit={handleChangePassword} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">New Password</label>
-          <Input
-            type="password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Confirm Password</label>
+            <Input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Confirm Password</label>
-          <Input
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-        </div>
-
-        <div className="flex justify-between items-center">
-          <Button type="submit" className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white">
-            Change Password
-          </Button>
-          <Button type="button" variant="ghost" onClick={onClose}>
-            Cancel
-          </Button>
-        </div>
-      </form>
+          <div className="flex items-center gap-2">
+            <Button type="submit" className="bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white flex-1">
+              Change Password
+            </Button>
+            <Button type="button" variant="ghost" onClick={onClose} className="flex-1">
+              Cancel
+            </Button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
