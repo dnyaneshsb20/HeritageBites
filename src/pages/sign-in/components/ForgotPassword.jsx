@@ -11,74 +11,74 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
   const [otp, setOtp] = useState(""); // for user input
   const [step, setStep] = useState(1); // 1 = enter email, 2 = enter OTP
   const [generatedOtp, setGeneratedOtp] = useState(""); // store OTP temporarily (optional)
-const handleSendOtp = async (e) => {
-  e.preventDefault();
-  setError("");
-  setMessage("");
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
 
-  if (!email.trim()) {
-    setError("Please enter your email.");
-    return;
-  }
-
-  try {
-    // Call server to generate and send OTP
-    const response = await fetch("/api/sendOtp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email }),
-    });
-
-    const data = await response.json();
-
-    if (data.error) {
-      setError(data.error);
+    if (!email.trim()) {
+      setError("Please enter your email.");
       return;
     }
 
-    setMessage("OTP sent to your email!");
-    setStep(2); // move to OTP input step
-  } catch (err) {
-    console.error(err);
-    setError("Something went wrong. Please try again.");
-  }
-};
+    try {
+      // Call server to generate and send OTP
+      const response = await fetch("/api/sendOtp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error);
+        return;
+      }
+
+      setMessage("OTP sent to your email!");
+      setStep(2); // move to OTP input step
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    }
+  };
 
 
-const handleVerifyOtp = async (e) => {
-  e.preventDefault();
-  setError("");
-  setMessage("");
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
 
-  if (!otp.trim()) {
-    setError("Please enter the OTP.");
-    return;
-  }
-
-  try {
-    // Call server-side OTP verification
-    const response = await fetch("/api/verifyOtp", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, otp }),
-    });
-
-    const data = await response.json();
-
-    if (data.error) {
-      setError(data.error); // server will return invalid/expired errors
+    if (!otp.trim()) {
+      setError("Please enter the OTP.");
       return;
     }
 
-    // OTP verified successfully
-    onClose(); // close ForgotPassword modal
-    openResetPassword(email, data.resetToken); // pass resetToken if needed
-    setMessage("OTP verified successfully!");
-  } catch (err) {
-    console.error(err);
-    setError("Something went wrong. Please try again.");
-  }
-};
+    try {
+      // Call server-side OTP verification
+      const response = await fetch("/api/verifyOtp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      const data = await response.json();
+
+      if (data.error) {
+        setError(data.error); // server will return invalid/expired errors
+        return;
+      }
+
+      // OTP verified successfully
+      onClose(); // close ForgotPassword modal
+      openResetPassword(email, data.resetToken); // pass resetToken if needed
+      setMessage("OTP verified successfully!");
+    } catch (err) {
+      console.error(err);
+      setError("Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -100,9 +100,22 @@ const handleVerifyOtp = async (e) => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white">
-              Send OTP
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white"
+              >
+                Send OTP
+              </Button>
+              <Button
+                type="button"
+                onClick={onClose} // close modal
+                className="flex-1"
+                varient="ghost"
+              >
+                Cancel
+              </Button>
+            </div>
           </form>
         )}
 
@@ -120,6 +133,14 @@ const handleVerifyOtp = async (e) => {
             </div>
             <Button type="submit" className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white">
               Verify OTP
+            </Button>
+            <Button
+              type="button"
+              onClick={onClose} // close modal
+              className="flex-1"
+              varient="ghost"
+            >
+              Cancel
             </Button>
           </form>
         )}
