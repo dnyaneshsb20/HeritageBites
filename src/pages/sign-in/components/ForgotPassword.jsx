@@ -23,7 +23,7 @@ const handleSendOtp = async (e) => {
 
   try {
     // Call server to generate and send OTP
-    const response = await fetch("api/sendOtp", {
+    const response = await fetch("http://localhost:5000/sendOtp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -57,7 +57,7 @@ const handleVerifyOtp = async (e) => {
 
   try {
     // Call server-side OTP verification
-    const response = await fetch("api/verifyOtp", {
+    const response = await fetch("http://localhost:5001/verifyOtp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
