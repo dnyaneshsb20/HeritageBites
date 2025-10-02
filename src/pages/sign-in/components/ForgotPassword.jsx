@@ -110,8 +110,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
               <Button
                 type="button"
                 onClick={onClose} // close modal
-                className="flex-1"
-                varient="ghost"
+                className="flex-1 bg-white text-black hover:bg-accent hover:text-accent-foreground"
               >
                 Cancel
               </Button>
@@ -137,8 +136,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
             <Button
               type="button"
               onClick={onClose} // close modal
-              className="flex-1"
-              varient="ghost"
+              className="flex-1 bg-white text-black Uhover:bg-accent hover:text-accent-foreground"
             >
               Cancel
             </Button>
