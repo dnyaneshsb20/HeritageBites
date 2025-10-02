@@ -29,7 +29,8 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+
 
       if (data.error) {
         setError(data.error);
