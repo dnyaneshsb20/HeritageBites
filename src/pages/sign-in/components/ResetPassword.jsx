@@ -28,7 +28,7 @@ const ResetPassword = ({ resetToken, onClose }) => {
       console.log("Sending reset request:", { resetToken, newPassword });
 
       // Use resetToken instead of calling Supabase directly
-      const response = await fetch("http://localhost:5002/resetPassword", {
+      const response = await fetch("api/resetPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resetToken, newPassword }),
