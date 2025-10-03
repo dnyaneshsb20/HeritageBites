@@ -1,4 +1,5 @@
 // pages/api/sendOtp.js
+
 import nodemailer from "nodemailer";
 import { createClient } from "@supabase/supabase-js";
 
@@ -8,6 +9,7 @@ const supabase = createClient(
 );
 
 // Generate 6-digit OTP
+//new comment
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
