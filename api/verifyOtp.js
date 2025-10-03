@@ -1,6 +1,6 @@
 // pages/api/verifyOtp.js
 import crypto from "crypto";
-//comment
+//comments added
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
