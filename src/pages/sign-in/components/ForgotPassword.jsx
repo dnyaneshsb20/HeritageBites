@@ -133,16 +133,21 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white">
-              Verify OTP
-            </Button>
-            <Button
-              type="button"
-              onClick={onClose} // close modal
-              className="flex-1 bg-white text-black hover:bg-accent hover:text-accent-foreground"
-            >
-              Cancel
-            </Button>
+            <div className="flex space-x-3">
+              <Button
+                type="submit"
+                className="flex-1 bg-gradient-to-r from-[#f87d46] to-[#fa874f] text-white"
+              >
+                Verify OTP
+              </Button>
+              <Button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-white text-black hover:bg-accent hover:text-accent-foreground"
+              >
+                Cancel
+              </Button>
+            </div>
           </form>
         )}
       </div>
