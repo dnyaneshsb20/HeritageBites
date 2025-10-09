@@ -138,10 +138,10 @@ const Header = () => {
         {/* Logo */}
         <Link to="/recipe-discovery-dashboard" className="flex items-center space-x-2">
           <div className="flex items-center justify-center w-8 h-8 bg-primary rounded-lg">
-            <Icon name="ChefHat" size={20} color="white" />
+            <span className="text-white text-sm font-bold">HB</span>
           </div>
           <span className="text-xl font-heading font-semibold text-foreground">
-            DishCover
+            HeritageBites
           </span>
         </Link>
 
