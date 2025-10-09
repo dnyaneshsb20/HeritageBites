@@ -44,7 +44,13 @@ async function sendEmail(to, otp) {
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        console.log("Error sending OTP:", error);
+    } else {
+        console.log("OTP sent:", info.response);
+    }
+});
 }
 
 app.post("/sendOtp", async (req, res) => {

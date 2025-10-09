@@ -22,7 +22,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
 
     try {
       // Call server to generate and send OTP
-      const response = await fetch("https://heritage-bites.vercel.app/api/sendOtp", {
+      const response = await fetch("http://localhost:5000/sendOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -60,7 +60,7 @@ const ForgotPassword = ({ onClose, openResetPassword }) => {
 
     try {
       // Call server-side OTP verification
-      const response = await fetch("https://heritage-bites.vercel.app/api/verifyOtp", {
+      const response = await fetch("http://localhost:5001/verifyOtp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
