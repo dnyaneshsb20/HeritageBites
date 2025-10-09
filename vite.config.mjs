@@ -8,7 +8,8 @@ export default defineConfig({
   base: "/", // ensures assets load correctly on Vercel
   build: {
     outDir: "build", // output folder
-    chunkSizeWarningLimit: 2000
+    chunkSizeWarningLimit: 2000,
+    sourcemap: false // disable source maps to avoid Lucide .map file errors
   },
   plugins: [tsconfigPaths(), react(), tagger()],
   server: {
