@@ -28,14 +28,14 @@ const ResetPassword = ({ resetToken, onClose }) => {
       console.log("Sending reset request:", { resetToken, newPassword });
 
       // Use resetToken instead of calling Supabase directly
-      const response = await fetch("https://heritage-bites.vercel.app/api/resetPassword", {
+      const response = await fetch("http://localhost:5002/resetPassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resetToken, newPassword }),
       });
-      console.log("Response status:", response.status);
-      console.log("Response text:", await response.text());
       const result = await response.json();
+      console.log("Result:", result);
+     
 
       if (result.error) {
         setError(result.error);
