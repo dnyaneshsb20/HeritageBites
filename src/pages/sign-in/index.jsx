@@ -20,6 +20,7 @@ const SignIn = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("");
 
   const [error, setError] = useState("");
   const [showForgot, setShowForgot] = useState(false);
@@ -56,7 +57,7 @@ const SignIn = () => {
               user_id: authData.user.id,
               name: fullName,
               email,
-              role: "user",
+              role: role,
             },
           ])
           .select()
@@ -67,9 +68,31 @@ const SignIn = () => {
           return;
         }
 
-        console.log("New user created:", data);
-        alert("Account created! Now you can log in.");
-        setIsSignUp(false);
+        if (role === "farmer") {
+          const { error: farmerError } = await supabase
+            .from("farmers")
+            .insert([
+              {
+                user_id: data.user_id,
+                bio: "", // optional, can let them fill later
+                certifications: "",
+                contact_info: "",
+              },
+            ]);
+
+          if (farmerError) {
+            setError(farmerError.message);
+            return;
+          }
+        }
+        if (role === "farmer") {
+          //navigate("/farmer-profile"); // page to fill bio/certifications/contact_info
+          alert("Account created! Now you can log in.");
+          setIsSignUp(false);
+        } else {
+          alert("Account created! Now you can log in.");
+          setIsSignUp(false);
+        }
 
       } catch (err) {
         console.error(err);
@@ -143,18 +166,38 @@ const SignIn = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {isSignUp && (
-            <div>
-              <label className="text-sm font-medium block mb-1">
-                Full Name
-              </label>
-              <Input
-                type="text"
-                placeholder="Enter Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </div>
+            <>
+              {/* Full Name field */}
+              <div>
+                <label className="text-sm font-medium block mb-1">
+                  Full Name
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Enter Full Name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+
+              {/* Role selection */}
+              <div>
+                <label className="text-sm font-medium block mb-1">
+                  Register As
+                </label>
+                <select
+                  className="w-full border border-border rounded-md p-2 bg-background text-foreground"
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  required
+                >
+                  <option value="">Select Role</option>
+                  <option value="user">User</option>
+                  <option value="farmer">Farmer</option>
+                </select>
+              </div>
+            </>
           )}
 
           {/* Email (always visible) */}
@@ -263,7 +306,7 @@ const SignIn = () => {
       {showForgot &&
         <ForgotPassword
           onClose={() => setShowForgot(false)}
-          openResetPassword={(email,token) => {
+          openResetPassword={(email, token) => {
             setResetEmail(email);
             setResetToken(token);
             setShowForgot(false);
