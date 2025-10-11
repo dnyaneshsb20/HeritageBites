@@ -152,6 +152,9 @@ const SignIn = () => {
       } else {
         navigate("/recipe-discovery-dashboard");
       }
+console.log("Fetched profile:", profile);
+console.log("Profile error:", profileError);
+console.log("User ID from auth:", data.user.id);
 
     } catch (err) {
       console.error(err);
