@@ -32,14 +32,15 @@ const SignIn = () => {
     e.preventDefault();
     setError("");
 
+    // --- SIGN UP ---
     if (isSignUp) {
-      // simple validation for signup
       if (password !== confirmPassword) {
         setError("Passwords do not match.");
         return;
       }
+
       try {
-        // Insert new user into users table
+        // Sign up with Supabase
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
@@ -50,6 +51,12 @@ const SignIn = () => {
           return;
         }
 
+        if (!authData.user) {
+          setError("Sign up failed. No user returned.");
+          return;
+        }
+
+        // Insert into users table
         const { data, error: insertError } = await supabase
           .from("users")
           .insert([
@@ -68,13 +75,14 @@ const SignIn = () => {
           return;
         }
 
+        // If farmer, insert into farmers table
         if (role === "farmer") {
           const { error: farmerError } = await supabase
             .from("farmers")
             .insert([
               {
                 user_id: data.user_id,
-                bio: "", // optional, can let them fill later
+                bio: "",
                 certifications: "",
                 contact_info: "",
               },
@@ -85,21 +93,21 @@ const SignIn = () => {
             return;
           }
         }
-        if (role === "farmer") {
-          //navigate("/farmer-profile"); // page to fill bio/certifications/contact_info
-          alert("Account created! Now you can log in.");
-          setIsSignUp(false);
-        } else {
-          alert("Account created! Now you can log in.");
-          setIsSignUp(false);
-        }
+
+        alert(
+          "Account created! Please check your email to confirm your account before signing in."
+        );
+        setIsSignUp(false);
+        return; // stop here to prevent automatic sign-in
 
       } catch (err) {
         console.error(err);
-        setError("Something went wrong. Please try again.");
+        setError("Something went wrong during sign-up. Please try again.");
+        return;
       }
     }
 
+    // --- SIGN IN ---
     if (!email.trim() || !password.trim()) {
       setError("Please enter both email and password.");
       return;
@@ -110,11 +118,18 @@ const SignIn = () => {
         email,
         password,
       });
+
+      if (error) {
+        setError(error.message);
+        return;
+      }
+
       if (!data.user) {
         setError("Invalid email or password.");
         return;
       }
 
+      // Fetch profile from users table
       const { data: profile, error: profileError } = await supabase
         .from("users")
         .select("*")
@@ -129,15 +144,18 @@ const SignIn = () => {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("user", JSON.stringify(profile || data.user));
 
+      // Role-based navigation
       if (profile?.role === "admin") {
         navigate("/admin-recipe-management");
+      } else if (profile?.role === "farmer") {
+        navigate("/farmer-dashboard");
       } else {
         navigate("/recipe-discovery-dashboard");
       }
 
     } catch (err) {
       console.error(err);
-      setError("Something went wrong. Please try again.");
+      setError("Something went wrong during sign-in. Please try again.");
     }
   };
 
