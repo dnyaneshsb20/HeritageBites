@@ -45,17 +45,13 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
 
   const handleSave = async () => {
     try {
-      // Get the signed-in user
       const { data: authData, error: authError } = await supabase.auth.getUser();
-      if (authError || !authData?.user) {
-        console.error("No authenticated user found:", authError);
-        return;
-      }
+      if (authError || !authData?.user) return;
 
       const userId = authData.user.id;
 
-      // Update the users table
-      const { error } = await supabase
+      // Update users table
+      const { error: userError } = await supabase
         .from("users")
         .update({
           name: formData.name,
@@ -63,17 +59,34 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
           location: formData.location,
         })
         .eq("user_id", userId);
+      if (userError) return;
 
-      if (error) {
-        console.error("Error updating profile:", error);
-        return;
+      // Upsert user_profile table
+      const { error: profileError } = await supabase
+        .from("user_profile")
+        .upsert({
+          user_id: userId,
+          age_group: formData.ageGroup || null,
+          gender: formData.gender || null,
+          height_cm: formData.height || null,
+          weight_kg: formData.weight || null,
+          activity_level: formData.activityLevel || null,
+          preferences: formData.preferences || null,
+          health_goals: formData.healthGoals || null,
+        }, { onConflict: "user_id" });
+      if (profileError) return;
+
+      // Call parent update
+      onUpdate(formData);
+
+      // ✅ Update profile completion after saving
+      if (typeof onUpdateCompletion === "function") {
+        onUpdateCompletion(); // call a function in parent to recalc completion
       }
 
-      // Call parent update and exit edit mode
-      onUpdate(formData);
       setIsEditing(false);
     } catch (err) {
-      console.error("Unexpected error while saving profile:", err);
+      console.error(err);
     }
   };
 
@@ -102,23 +115,49 @@ const PersonalInfoSection = ({ isExpanded, onToggle, userData, onUpdate }) => {
 
         if (!user) return;
 
-        const { data, error } = await supabase
+        // Fetch from users table
+        const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('name, email, created_at')
+          .select('name, email, location, created_at')
           .eq('user_id', user.id)
           .single();
 
-        if (!error && data && mounted) {
-          setDbUser(data);
-          setFormData(prev => ({
-            ...prev,
-            name: data.name,
-            email: data.email,
-            joinDate: data.created_at
-          }));
+        if (userError) {
+          console.error('Error fetching user data:', userError);
+          return;
         }
+
+        // Fetch from user_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
+          .select('age_group, gender, height_cm, weight_kg, activity_level, preferences, health_goals')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileError && profileError.code !== 'PGRST116') { // PGRST116 = no row found
+          console.error('Error fetching user_profile data:', profileError);
+          return;
+        }
+
+        if (mounted) {
+          setDbUser(userData);
+          setFormData({
+            name: userData.name || '',
+            email: userData.email || '',
+            location: userData.location || '',
+            joinDate: userData.created_at,
+            ageGroup: profileData?.age_group || '',
+            gender: profileData?.gender || '',
+            height: profileData?.height_cm || '',
+            weight: profileData?.weight_kg || '',
+            activityLevel: profileData?.activity_level || '',
+            preferences: profileData?.preferences || null,
+            healthGoals: profileData?.health_goals || null,
+          });
+        }
+
       } catch (err) {
-        console.error('Error fetching user data:', err);
+        console.error('Unexpected error fetching data:', err);
       }
     };
 
