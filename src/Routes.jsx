@@ -12,6 +12,7 @@ import RecipeDiscoveryDashboard from './pages/recipe-discovery-dashboard';
 import Dashboard from './pages/dashboard';
 import SignIn from "./pages/sign-in";
 import AISuggestions from "./pages/ai-suggestions";
+import FarmerDashboard from "./pages/farmer-dashboard/FarmerDashboard";
 
 const Routes = () => {
   return (
@@ -29,6 +30,7 @@ const Routes = () => {
         <Route path="/ai-suggestions" element={<AISuggestions />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/farmer-dashboard" element={<FarmerDashboard/>}></Route>
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
     </ErrorBoundary>
