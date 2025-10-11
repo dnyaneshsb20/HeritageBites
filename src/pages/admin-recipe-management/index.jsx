@@ -7,6 +7,7 @@ import RecipePreviewPanel from './components/RecipePreviewPanel';
 import FilterControls from './components/FilterControls';
 import AnalyticsDashboard from './components/AnalyticsDashboard';
 import ContributorManagement from './components/ContributorManagement';
+import Footer from '../dashboard/components/Footer';
 
 const AdminRecipeManagement = () => {
   const [activeTab, setActiveTab] = useState('submissions');
@@ -402,6 +403,7 @@ const AdminRecipeManagement = () => {
           onRequestModification={handleRequestModification}
         />
       )}
+      <Footer/>
     </div>
   );
 };
