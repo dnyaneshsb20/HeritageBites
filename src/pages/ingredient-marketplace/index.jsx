@@ -71,7 +71,7 @@ useEffect(() => {
         category: item.ingredients?.category_id || 'general',
         isOrganic: item.certifications?.toLowerCase()?.includes('organic'),
         farmer: {
-          name: 'Dishcover Farmer',
+          name: 'Farmer',
           location: 'India',
         },
         certifications: item.certifications
