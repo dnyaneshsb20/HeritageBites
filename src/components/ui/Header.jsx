@@ -115,11 +115,19 @@ const Header = () => {
 
       if (error) {
         console.warn("No row found in users table, using Auth info");
-        // fallback: use Auth info
+
+        // Try fetching role separately from users table before fallback
+        const { data: roleData } = await supabase
+          .from("users")
+          .select("role")
+          .eq("email", authUser.email)
+          .single();
+
+        // fallback: use Auth info but include DB role if found
         setUserProfile({
           name: authUser.email.split("@")[0], // default name from email
           email: authUser.email,
-          role: "user",
+          role: roleData?.role ? `${roleData.role}` : "user",
           user_id: authUser.id,
         });
       } else {
@@ -129,8 +137,6 @@ const Header = () => {
 
     fetchUserProfile();
   }, []);
-
-
 
   return (
     <header className="sticky top-0 z-100 bg-background border-b border-border shadow-warm">
