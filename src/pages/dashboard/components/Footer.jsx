@@ -9,15 +9,17 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <ChefHat className="h-8 w-8 text-golden" />
-              <span className="text-2xl font-bold">DishCover</span>
+              <div className="flex items-center justify-center w-8 h-8 bg-golden rounded-lg">
+                <span className="text-earth-brown text-md font-bold">HB</span>
+              </div>
+              <span className="text-2xl font-bold">HeitageBites</span>
             </div>
             <p className="text-white/80 leading-relaxed">
-              Preserving India's culinary heritage while connecting communities 
+              Preserving India's culinary heritage while connecting communities
               through authentic flavors and sustainable practices.
             </p>
             <div className="flex space-x-4">
-              <Button variant="golden" size="sm">
+              <Button variant="golden" size="sm" className="text-earth-brown bg-golden">
                 Download App
               </Button>
             </div>
@@ -25,7 +27,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold text-golden mb-4">Discover</h4>
+            <h4 className="text-lg font-semibold text-golden mb-4">Heritage Bites</h4>
             <ul className="space-y-3">
               <li><a href="#" className="text-white/80 hover:text-golden transition-colors">Regional Recipes</a></li>
               <li><a href="#" className="text-white/80 hover:text-golden transition-colors">Festival Foods</a></li>
@@ -53,18 +55,18 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-golden" />
-                <span className="text-white/80">hello@dishcover.in</span>
+                <span className="text-white/80">heritagebites007@gmail.com</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-golden" />
-                <span className="text-white/80">+91 98765 43210</span>
+                <span className="text-white/80">+91 12345 67890</span>
               </li>
               <li className="flex items-center space-x-2">
                 <MapPin className="h-4 w-4 text-golden" />
-                <span className="text-white/80">Mumbai, India</span>
+                <span className="text-white/80">Pune, India</span>
               </li>
             </ul>
-            
+
             {/* Newsletter */}
             <div className="mt-6">
               <h5 className="font-medium text-golden mb-2">Stay Updated</h5>
@@ -85,7 +87,7 @@ const Footer = () => {
         {/* Bottom Section */}
         <div className="border-t border-white/20 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/60 text-sm">
-            © 2024 DishCover. Preserving India's culinary heritage.
+            © 2025 HeritageBites. Preserving India's culinary heritage.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-white/60 hover:text-golden transition-colors text-sm">Privacy Policy</a>
