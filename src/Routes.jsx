@@ -13,11 +13,7 @@ import Dashboard from './pages/dashboard';
 import SignIn from "./pages/sign-in";
 import AISuggestions from "./pages/ai-suggestions";
 import FarmerDashboard from "./pages/farmer-dashboard/FarmerDashboard";
-<<<<<<< HEAD
-
-=======
-import aiuggestions from "pages/ai-suggestions/aisuggestions";
->>>>>>> master
+import aisuggestions from "pages/ai-suggestions/aisuggestions";
 const Routes = () => {
   return (
     <ErrorBoundary>
@@ -34,10 +30,7 @@ const Routes = () => {
         <Route path="/ai-suggestions" element={<AISuggestions />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/signin" element={<SignIn />} />
-<<<<<<< HEAD
-=======
         <Route path="/ai-suggestions" element={<aisuggestions />} />
->>>>>>> master
         <Route path="/farmer-dashboard" element={<FarmerDashboard/>}></Route>
         <Route path="*" element={<NotFound />} />
       </RouterRoutes>
