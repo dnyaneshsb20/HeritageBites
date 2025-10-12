@@ -39,6 +39,7 @@ A modern React-based project utilizing the latest frontend technologies and tool
 
 ```
 react_app/
+<<<<<<< HEAD
 ├── public/             # Static assets
 ├── src/
 │   ├── components/     # Reusable UI components
@@ -52,6 +53,70 @@ react_app/
 ├── package.json        # Project dependencies and scripts
 ├── tailwind.config.js  # Tailwind CSS configuration
 └── vite.config.js      # Vite configuration
+=======
+├── functions/
+│   ├── .env
+│   ├── db.js
+│   ├── package.json
+│   ├── resetPassword.js
+│   ├── sendOtp.js
+│   ├── verifyOtp.js
+├── public/             # Static assets
+│   ├── assets
+│   ├───── images
+│   ├── favicon.ico
+│   ├── manifest.json
+│   ├── robots.txt
+├── src/
+│   ├── assets/
+│   ├── components/     # Reusable UI components
+│   ├───── ui/
+│   ├──────── Button.jsx
+│   ├──────── card.tsx
+│   ├──────── Checkbox.jsx
+│   ├──────── Header.jsx
+│   ├──────── Input.jsx
+│   ├──────── Select.jsx
+│   ├───── AppIcon.jsx
+│   ├───── AppImage.jsx
+│   ├───── ErrorBoundary.jsx
+│   ├───── RequireAuth.jsx
+│   ├───── ScrollToTop.jsx
+│   ├── context/
+│   ├───── AuthContext.jsx
+│   ├── lib/
+│   ├───── utils.ts
+│   ├── pages/          # Page components
+│   ├───── admin-recipe-management/
+│   ├───── ai-suggestions #chatbot
+│   ├───── dashboard
+│   ├───── farmer-dasboard
+│   ├───── ingredient-marketplace
+│   ├───── recipe-detail-instructions
+│   ├───── resipe-discovery-dashboard
+│   ├───── recipe-submission-management
+│   ├───── sign-in
+│   ├───── user-profile-health-goals
+│   ├───── NotFound.jsx
+│   ├── styles/         # Global styles and Tailwind configuration
+│   ├── utils/
+│   ├── App.jsx         # Main application component
+│   ├── Routes.jsx      # Application routes
+│   └── index.jsx       # Application entry point
+│   ├── supabaseClient.js
+├── .env                # Environment variables
+├── .gitignore
+├── favicon.ico
+├── index.html          # HTML template
+├── jsconfig.json
+├── package.json        # Project dependencies and scripts
+├── postcss.config.js
+├── README.md
+├── tailwind.config.js  # Tailwind CSS configuration
+├── vercel.json
+├── vite.config.mjs      # Vite configuration
+└── vite-env.d.ts
+>>>>>>> master
 ```
 
 ## 🧩 Adding Routes
