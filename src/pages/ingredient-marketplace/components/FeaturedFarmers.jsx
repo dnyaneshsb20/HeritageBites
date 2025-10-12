@@ -14,7 +14,21 @@ const FeaturedFarmers = ({ onFarmerClick }) => {
 
   const fetchFarmers = async () => {
     setLoading(true)
-    const { data, error } = await supabase.from('farmers').select('*')
+    const { data, error } = await supabase
+  .from("farmers")
+  .select(`
+    farmer_id,
+    bio,
+    certifications,
+    contact_info,
+    users:user_id (
+      name,
+      email,
+      location,
+      role
+    )
+  `);
+
     if (error) {
       console.error('Error fetching farmers:', error)
     } else {
@@ -52,7 +66,7 @@ const FeaturedFarmers = ({ onFarmerClick }) => {
               <div className="relative">
                 <Image
                   src={farmer.image_url || 'https://via.placeholder.com/150'}
-                  alt={farmer.name}
+                  alt={farmer.users?.name || "Unnamed Farmer"}
                   className="w-12 h-12 rounded-full object-cover"
                 />
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-success rounded-full border-2 border-background flex items-center justify-center">
@@ -60,10 +74,10 @@ const FeaturedFarmers = ({ onFarmerClick }) => {
                 </div>
               </div>
               <div className="flex-1">
-                <h3 className="font-body font-semibold text-foreground">{farmer.name}</h3>
+                <h3 className="font-body font-semibold text-foreground">{farmer.users?.name || "Unnamed Farmer"}</h3>
                 <div className="flex items-center space-x-1">
                   <Icon name="MapPin" size={12} className="text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{farmer.location}</span>
+                  <span className="text-sm text-muted-foreground">{farmer.users?.location || "Unknown location"}</span>
                 </div>
               </div>
             </div>

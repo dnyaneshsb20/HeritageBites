@@ -13,7 +13,7 @@ import Dashboard from './pages/dashboard';
 import SignIn from "./pages/sign-in";
 import AISuggestions from "./pages/ai-suggestions";
 import FarmerDashboard from "./pages/farmer-dashboard/FarmerDashboard";
-import aiuggestions from "pages/ai-suggestions/AISuggestions";
+import aiuggestions from "pages/ai-suggestions/aisuggestions";
 const Routes = () => {
   return (
     <ErrorBoundary>

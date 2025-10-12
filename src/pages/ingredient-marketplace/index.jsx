@@ -10,6 +10,7 @@ import FeaturedFarmers from './components/FeaturedFarmers';
 import ProductDetailModal from './components/ProductDetailModal';
 import SearchBar from './components/SearchBar';
 import Footer from '../dashboard/components/Footer';
+import { supabase } from "../../supabaseClient";
 
 const IngredientMarketplace = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -190,6 +191,61 @@ const IngredientMarketplace = () => {
 
   const [filteredProducts, setFilteredProducts] = useState(allProducts);
   const productsPerPage = 12;
+useEffect(() => {
+  const fetchProducts = async () => {
+    setIsLoading(true);
+
+    const { data, error } = await supabase
+      .from('products')
+      .select(`
+        product_id,
+        name,
+        price,
+        unit,
+        stock,
+        certifications,
+        image_url,
+        ingredients (
+          ingredient_id,
+          name,
+          nutritional_info,
+          category_id
+        )
+      `);
+
+    if (error) {
+      console.error('Error fetching products:', error);
+    } else {
+      const products = data.map((item) => ({
+        id: item.product_id,
+        name: item.name || item.ingredients?.name || 'Unnamed Product',
+        image: item.image_url || 'https://placehold.co/400x400?text=Product',
+        price: Number(item.price) || 0,
+        unit: item.unit || '1kg',
+        stock: item.stock || 0,
+        rating: 4.5, // placeholder, can later come from reviews table
+        reviewCount: Math.floor(Math.random() * 200), // mock count
+        category: item.ingredients?.category_id || 'general',
+        isOrganic: item.certifications?.toLowerCase()?.includes('organic'),
+        farmer: {
+          name: 'Farmer',
+          location: 'India',
+        },
+        certifications: item.certifications
+          ? item.certifications.split(',').map((c) => c.trim())
+          : [],
+        description: item.ingredients?.nutritional_info || '',
+      }));
+
+      setAllProducts(products);
+      setFilteredProducts(products);
+    }
+
+    setIsLoading(false);
+  };
+
+  fetchProducts();
+}, []);
 
   // Filter and search logic
   useEffect(() => {

@@ -10,6 +10,7 @@ import AchievementBadgesSection from './components/AchievementBadgesSection';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
 import Footer from '../dashboard/components/Footer';
+import { supabase } from '../../supabaseClient';
 
 const UserProfileHealthGoals = () => {
   const [expandedSections, setExpandedSections] = useState({
@@ -63,33 +64,99 @@ const UserProfileHealthGoals = () => {
 
   const [profileCompleteness, setProfileCompleteness] = useState(0);
 
-  // Calculate profile completeness
-  useEffect(() => {
-    let completedSections = 0;
-    const totalSections = 6;
+  const calculateProfileCompletion = (userData, profileData) => {
+    let completed = 0;
+    let total = 10; // total points, you can adjust
 
-    // Personal Info (always considered complete if basic fields are filled)
-    if (userData?.name && userData?.email) completedSections++;
-    
-    // Health Goals
-    if (healthGoals?.length > 0) completedSections++;
-    
-    // Dietary Restrictions (optional, but if set, counts as complete)
-    completedSections++; // Always count as complete since it's optional
-    
-    // Taste Preferences
-    if (tastePreferences?.favoriteIngredients && tastePreferences?.favoriteIngredients?.length > 0) {
-      completedSections++;
+    // Base info
+    if (userData?.name) completed += 1;
+    if (userData?.email) completed += 1;
+
+    // Profile info
+    if (profileData?.age_group) completed += 1;
+    if (profileData?.gender) completed += 1;
+    if (profileData?.height_cm) completed += 1;
+    if (profileData?.weight_kg) completed += 1;
+    if (profileData?.activity_level) completed += 1;
+    if (profileData?.preferences && Object.keys(profileData.preferences).length > 0) completed += 1;
+    if (profileData?.health_goals && profileData.health_goals.length > 0) completed += 1;
+
+    return Math.round((completed / total) * 100);
+  };
+
+  const updateProfileCompletion = async () => {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+      if (!user) return;
+
+      // Fetch latest user and profile data
+      const { data: userData } = await supabase.from('users').select('*').eq('user_id', user.id).single();
+      const { data: profileData } = await supabase.from('user_profile').select('*').eq('user_id', user.id).single();
+
+      const newCompletion = calculateProfileCompletion(userData, profileData);
+      setProfileCompleteness(newCompletion);
+
+    } catch (err) {
+      console.error('Error updating completion:', err);
     }
-    
-    // Regional Favorites
-    if (regionalFavorites?.length > 0) completedSections++;
-    
-    // Recipe History (always complete as it's auto-populated)
-    completedSections++;
+  };
 
-    setProfileCompleteness(Math.round((completedSections / totalSections) * 100));
-  }, [userData, healthGoals, dietaryRestrictions, tastePreferences, regionalFavorites]);
+  // Fetch user data and calculate initial profile completeness
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const user = authData?.user;
+        if (!user) return;
+
+        // Fetch from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('name, email, created_at, location')
+          .eq('user_id', user.id)
+          .single();
+
+        if (userError) {
+          console.error('Error fetching user:', userError);
+          return;
+        }
+
+        // Fetch from user_profile table
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profile')
+          .select('age_group, gender, height_cm, weight_kg, activity_level')
+          .eq('user_id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching profile:', profileError);
+        }
+
+        // Combine both into one object
+        setUserData({
+          name: userData?.name || '',
+          email: userData?.email || '',
+          location: userData?.location || '',
+          joinDate: userData?.created_at || '',
+          ageGroup: profileData?.age_group || '',
+          gender: profileData?.gender || '',
+          height: profileData?.height_cm || '',
+          weight: profileData?.weight_kg || '',
+          activityLevel: profileData?.activity_level || '',
+        });
+
+        // Calculate profile completion AFTER fetching both tables
+        const initialCompletion = calculateProfileCompletion(userData, profileData);
+        setProfileCompleteness(initialCompletion);
+
+      } catch (err) {
+        console.error('Error fetching data:', err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const toggleSection = (sectionKey) => {
     setExpandedSections(prev => ({
@@ -100,22 +167,27 @@ const UserProfileHealthGoals = () => {
 
   const handleUserDataUpdate = (newData) => {
     setUserData(newData);
+    updateProfileCompletion();
   };
 
   const handleHealthGoalsUpdate = (newGoals) => {
     setHealthGoals(newGoals);
+    updateProfileCompletion();
   };
 
   const handleDietaryRestrictionsUpdate = (newRestrictions) => {
     setDietaryRestrictions(newRestrictions);
+    updateProfileCompletion();
   };
 
   const handleTastePreferencesUpdate = (newPreferences) => {
     setTastePreferences(newPreferences);
+    updateProfileCompletion();
   };
 
   const handleRegionalFavoritesUpdate = (newFavorites) => {
     setRegionalFavorites(newFavorites);
+    updateProfileCompletion();
   };
 
   const getCompletionColor = (percentage) => {
@@ -174,6 +246,7 @@ const UserProfileHealthGoals = () => {
             onToggle={() => toggleSection('personalInfo')}
             userData={userData}
             onUpdate={handleUserDataUpdate}
+            onUpdateCompletion={updateProfileCompletion}
           />
 
           {/* Health Goals */}
@@ -223,8 +296,8 @@ const UserProfileHealthGoals = () => {
 
         {/* Action Buttons */}
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size="lg"
             iconName="Download"
             iconPosition="left"
@@ -232,8 +305,8 @@ const UserProfileHealthGoals = () => {
           >
             Export Profile Data
           </Button>
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             size="lg"
             iconName="Sparkles"
             iconPosition="left"
@@ -252,15 +325,15 @@ const UserProfileHealthGoals = () => {
                 Privacy & Data Security
               </h4>
               <p className="text-sm text-muted-foreground">
-                Your personal information and preferences are securely stored and used only to enhance your 
-                recipe discovery experience. We never share your data with third parties without your consent. 
+                Your personal information and preferences are securely stored and used only to enhance your
+                recipe discovery experience. We never share your data with third parties without your consent.
                 You can export or delete your data at any time.
               </p>
             </div>
           </div>
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
