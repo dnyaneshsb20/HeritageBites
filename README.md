@@ -39,6 +39,21 @@ A modern React-based project utilizing the latest frontend technologies and tool
 
 ```
 react_app/
+<<<<<<< HEAD
+├── public/             # Static assets
+├── src/
+│   ├── components/     # Reusable UI components
+│   ├── pages/          # Page components
+│   ├── styles/         # Global styles and Tailwind configuration
+│   ├── App.jsx         # Main application component
+│   ├── Routes.jsx      # Application routes
+│   └── index.jsx       # Application entry point
+├── .env                # Environment variables
+├── index.html          # HTML template
+├── package.json        # Project dependencies and scripts
+├── tailwind.config.js  # Tailwind CSS configuration
+└── vite.config.js      # Vite configuration
+=======
 ├── functions/
 │   ├── .env
 │   ├── db.js
@@ -101,6 +116,7 @@ react_app/
 ├── vercel.json
 ├── vite.config.mjs      # Vite configuration
 └── vite-env.d.ts
+>>>>>>> master
 ```
 
 ## 🧩 Adding Routes

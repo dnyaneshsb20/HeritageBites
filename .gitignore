@@ -1,5 +1,8 @@
 .DS_Store
+<<<<<<< HEAD
+=======
 .env
+>>>>>>> master
 node_modules
 .idea
 package-lock.json
