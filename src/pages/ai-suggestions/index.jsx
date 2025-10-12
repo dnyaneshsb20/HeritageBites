@@ -31,23 +31,15 @@ const AISuggestions = () => {
     setMessages((prev) => [...prev, { role: "user", text }]);
     setQuery("");
 
+    // Handle simple greetings without triggering recipe generation
+    const greetings = ["hi", "hello", "hey", "hii"];
+    if (greetings.includes(text.toLowerCase())) {
+      setMessages((prev) => [...prev, { role: "ai", text: "👋 Hello! Tell me what ingredients you have, and I’ll suggest a dish for you." }]);
+      return;
+    }
+
+    // Call AI for recipe
     try {
-      // Determine if this is a recipe request or casual message
-      const isRecipeRequest = /recipe|ingredients|dish|cook/i.test(text);
-
-      const messagesPayload = [
-        { role: "system", content: "You are a helpful Indian recipe assistant." },
-        { role: "user", content: text }
-      ];
-
-      if (isRecipeRequest) {
-        messagesPayload.push({
-          role: "user",
-          content: `Return a recipe strictly in JSON format like:
-{ "name": "", "ingredients": [""], "steps": [""] }`
-        });
-      }
-
       const response = await fetch("https://api.openai.com/v1/chat/completions", {
         method: "POST",
         headers: {
@@ -56,40 +48,46 @@ const AISuggestions = () => {
         },
         body: JSON.stringify({
           model: "gpt-4o-mini",
-          messages: messagesPayload,
+          messages: [
+            { role: "system", content: "You are a helpful Indian recipe assistant." },
+            { role: "user", content: `
+Suggest a recipe for: ${text}.
+Return it strictly in JSON format:
+{ "name": "", "ingredients": [""], "steps": [""] }
+` },
+          ],
           max_tokens: 600,
           temperature: 0.7,
         }),
       });
 
       const data = await response.json();
-      let reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a response.";
+      const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a recipe.";
 
-      // If it's a recipe request, parse JSON
-      if (isRecipeRequest) {
-        try {
-          const cleaned = reply.replace(/```json|```/g, "").trim();
-          const recipe = JSON.parse(cleaned);
-          reply = (
-            <div>
-              <h2 className="font-semibold text-lg">{recipe.name}</h2>
-              <h3 className="mt-2 font-medium">Ingredients:</h3>
-              <ul className="list-disc ml-5">
-                {recipe.ingredients.map((i, idx) => <li key={idx}>{i}</li>)}
-              </ul>
-              <h3 className="mt-2 font-medium">Steps:</h3>
-              <ol className="list-decimal ml-5">
-                {recipe.steps.map((s, idx) => <li key={idx}>{s}</li>)}
-              </ol>
-            </div>
-          );
-        } catch {
-          // fallback if JSON parsing fails
-          reply = data.choices?.[0]?.message?.content || "Sorry, could not parse recipe.";
-        }
+      // Parse JSON response
+      let recipe;
+      try {
+        const cleaned = reply.replace(/```json|```/g, "").trim();
+        recipe = JSON.parse(cleaned);
+      } catch {
+        recipe = { name: "Recipe", ingredients: [], steps: [reply] };
       }
 
-      setMessages((prev) => [...prev, { role: "ai", text: reply }]);
+      const formattedReply = (
+        <div>
+          <h2 className="font-semibold text-lg">{recipe.name}</h2>
+          <h3 className="mt-2 font-medium">Ingredients:</h3>
+          <ul className="list-disc ml-5">
+            {recipe.ingredients.map((i, idx) => <li key={idx}>{i}</li>)}
+          </ul>
+          <h3 className="mt-2 font-medium">Steps:</h3>
+          <ol className="list-decimal ml-5">
+            {recipe.steps.map((s, idx) => <li key={idx}>{s}</li>)}
+          </ol>
+        </div>
+      );
+
+      setMessages((prev) => [...prev, { role: "ai", text: formattedReply }]);
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => [...prev, { role: "ai", text: "⚠️ Sorry, something went wrong. Please try again." }]);
