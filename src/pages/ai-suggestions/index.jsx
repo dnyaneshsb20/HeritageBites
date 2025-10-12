@@ -132,6 +132,7 @@ const AISuggestions = () => {
               </button>
 
               {/* Input */}
+              {/* Comment */}
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
