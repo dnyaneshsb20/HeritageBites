@@ -20,7 +20,6 @@ const AISuggestions = () => {
     const text = query.trim();
     if (!text) return;
 
-    // Animate send button
     controls.start({
       x: [0, 40, -40, 0],
       y: [0, -40, 40, 0],
@@ -42,16 +41,47 @@ const AISuggestions = () => {
         body: JSON.stringify({
           model: "gpt-4o-mini",
           messages: [
-            { role: "system", content: "You are a helpful Indian recipe assistant. Suggest dishes based on ingredients." },
-            { role: "user", content: text },
+            { role: "system", content: "You are a helpful Indian recipe assistant." },
+            { role: "user", content: `
+Suggest a recipe for: ${text}.
+Return it strictly in JSON format:
+{ "name": "", "ingredients": [""], "steps": [""] }
+` },
           ],
-          max_tokens: 200,
+          max_tokens: 600,
+          temperature: 0.7,
         }),
       });
 
       const data = await response.json();
       const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a recipe.";
-      setMessages((prev) => [...prev, { role: "ai", text: reply }]);
+
+      // Parse JSON response
+      let recipe;
+try {
+  // Remove any ```json or ``` markers
+  const cleaned = reply.replace(/```json|```/g, "").trim();
+  recipe = JSON.parse(cleaned);
+} catch {
+  recipe = { name: "Recipe", ingredients: [], steps: [reply] };
+}
+
+
+      const formattedReply = (
+        <div>
+          <h2 className="font-semibold text-lg">{recipe.name}</h2>
+          <h3 className="mt-2 font-medium">Ingredients:</h3>
+          <ul className="list-disc ml-5">
+            {recipe.ingredients.map((i, idx) => <li key={idx}>{i}</li>)}
+          </ul>
+          <h3 className="mt-2 font-medium">Steps:</h3>
+          <ol className="list-decimal ml-5">
+            {recipe.steps.map((s, idx) => <li key={idx}>{s}</li>)}
+          </ol>
+        </div>
+      );
+
+      setMessages((prev) => [...prev, { role: "ai", text: formattedReply }]);
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => [...prev, { role: "ai", text: "⚠️ Sorry, something went wrong. Please try again." }]);
@@ -113,15 +143,14 @@ const AISuggestions = () => {
           <div className="max-w-4xl mx-auto space-y-4">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} items-end gap-2`}>
-                {m.role === "ai" && (
+                {m.role === "ai" ? (
                   <>
                     <div className="flex-shrink-0 mt-[2px]"><Icon name="Sparkles" size={20} /></div>
                     <div className="px-4 py-2 rounded-2xl text-base shadow break-words inline-block max-w-max" style={{ background: "#FFF7E6", color: "#000", border: "1px solid #F9BC06" }}>
                       {m.text}
                     </div>
                   </>
-                )}
-                {m.role === "user" && (
+                ) : (
                   <>
                     <div className="px-4 py-2 rounded-2xl text-base shadow break-words inline-block max-w-max" style={{ background: "linear-gradient(to right, #f87d46, #fa874f)", color: "#fff" }}>
                       {m.text}
